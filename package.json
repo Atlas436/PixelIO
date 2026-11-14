@@ -1,0 +1,13 @@
+{
+  "name": "pixel-oi",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Sistema operacional fictício em pixel art no navegador",
+  "scripts": {
+    "check": "node --check js/main.js && node --check js/apps.js && node --check js/assets.js && node --check js/desktop.js && node --check js/taskbar.js && node --check js/windows.js",
+    "test": "node smoke-test.cjs"
+  },
+  "devDependencies": {
+    "playwright": "1.65.1"
+  }
+}
