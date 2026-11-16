@@ -1,4 +1,6 @@
-// Catálogo: os aplicativos completos e seus ícones definitivos virão depois.
+import { createSpider } from "./spider.js";
+
+// Catálogo: Paciência usa o verso das cartas; os outros ícones virão depois.
 export const apps = [
   { id: "files", name: "Arquivos", initials: "AR" },
   { id: "music", name: "Música", initials: "MU" },
@@ -13,6 +15,14 @@ export const apps = [
 ];
 
 export function placeholder(app) {
+  if (app.id === "solitaire") {
+    const icon = document.createElement("img");
+    icon.className = "app-icon";
+    icon.src = new URL("../assets/baralho/verso-pixel-oi.png", import.meta.url).href;
+    icon.alt = "";
+    icon.draggable = false;
+    return icon;
+  }
   const icon = document.createElement("span");
   icon.className = "app-placeholder";
   icon.textContent = app.initials;
@@ -21,6 +31,7 @@ export function placeholder(app) {
 }
 
 export function appContent(app) {
+  if (app.id === "solitaire") return createSpider();
   const content = document.createElement("div");
   content.className = "window-body";
   const eyebrow = document.createElement("p");
