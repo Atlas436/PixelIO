@@ -31,6 +31,9 @@ const fs = require("node:fs");
     await page.locator('.desktop-app[data-app="solitaire"]').dblclick();
     const app = page.locator(".spider-app");
     const win = page.locator('.window[data-app="solitaire"]');
+    assert.equal(await page.locator(".spider-mode").count(), 3);
+    assert.equal(await app.count(), 0);
+    await page.locator('[data-mode="1"]').click();
     await app.waitFor({ state: "visible" });
     assert.equal(await app.locator(".spider-column").count(), 10);
     assert.equal(await app.locator(".spider-card").count(), 54);
@@ -45,6 +48,62 @@ const fs = require("node:fs");
     assert.equal(await app.locator('[data-stat="moves"]').textContent(), "1");
     await app.getByRole("button", { name: "Desfazer", exact: true }).click();
     assert.equal(await app.locator(".spider-card").count(), 54);
+    // Início preserva a partida; trocar modo exige confirmação, cancelável.
+    for (const mode of [2, 4, 1]) {
+      await app.getByRole("button", { name: "Início", exact: true }).click();
+      assert(await page.locator(".spider-home").isVisible());
+      await page.locator(`[data-mode="${mode}"]`).click();
+      assert(await page.locator(".spider-start-confirm").isVisible());
+      await page.keyboard.press("Escape");
+      assert(await page.locator(".spider-start-confirm").isHidden());
+      await page
+        .getByRole("button", { name: "Continuar partida", exact: true })
+        .click();
+      assert.equal(await app.locator('[data-stat="moves"]').textContent(), "0");
+      await app.getByRole("button", { name: "Início", exact: true }).click();
+      await page.locator(`[data-mode="${mode}"]`).click();
+      await page.locator('[data-start="yes"]').click();
+      assert.match(
+        await app.locator("[data-difficulty]").textContent(),
+        new RegExp(`${mode} NAIPE`),
+      );
+      assert.equal(await app.locator(".spider-card").count(), 54);
+      const suits = await app
+        .locator(".face-up")
+        .evaluateAll((cards) => [...new Set(cards.map((c) => c.dataset.suit))]);
+      assert(
+        suits.every((suit) =>
+          ["spades", "hearts", "diamonds", "clubs"]
+            .slice(0, mode)
+            .includes(suit),
+        ),
+      );
+      await app.locator(".spider-stock").click();
+      await app.getByRole("button", { name: "Desfazer", exact: true }).click();
+    }
+    // Verifica todos os 52 valores/naipes, inclusive PNGs fora da mesa inicial.
+    const provisional = await page.evaluate(async () => {
+      const { cardImage } = await import("./js/spider-cards.js");
+      const gallery = document.createElement("div");
+      gallery.hidden = true;
+      gallery.id = "test-card-gallery";
+      let placeholders = 0;
+      for (const suit of ["spades", "hearts", "diamonds", "clubs"])
+        for (let rank = 1; rank <= 13; rank++) {
+          const image = cardImage({ rank, suit, faceUp: true });
+          if (image.tagName !== "IMG") placeholders++;
+          gallery.append(image);
+        }
+      document.body.append(gallery);
+      return placeholders;
+    });
+    assert.equal(provisional, 1);
+    await page.waitForFunction(() =>
+      [...document.querySelectorAll("#test-card-gallery img")].every(
+        (i) => i.complete && i.naturalWidth > 0,
+      ),
+    );
+    await page.locator("#test-card-gallery").evaluate((e) => e.remove());
     // Cenário controlado pelo módulo de regras, sem API de teste no produto.
     await page.evaluate(async () => {
       const { SpiderGame } = await import("./js/spider-rules.js");
@@ -126,6 +185,9 @@ const fs = require("node:fs");
       .getByRole("button", { name: "Fechar Paciência", exact: true })
       .click();
     await page.locator('.desktop-app[data-app="solitaire"]').dblclick();
+    await page
+      .getByRole("button", { name: "Continuar partida", exact: true })
+      .click();
     assert.equal(await app.locator('[data-stat="moves"]').textContent(), "1");
     // A oitava sequência deve exibir a vitória.
     await page.evaluate(async () => {
@@ -205,11 +267,12 @@ const fs = require("node:fs");
     await touchPage.locator("#start").tap();
     await touchPage.locator("#system").waitFor({ state: "visible" });
     await touchPage.locator('.desktop-app[data-app="solitaire"]').tap();
+    await touchPage.locator('[data-mode="2"]').tap();
     await touchPage.locator(".spider-card.face-up").first().tap();
     assert((await touchPage.locator(".spider-card.selected").count()) > 0);
     await mobile.close();
     console.log(
-      "PASS Spider: regras integradas, distribuir/desfazer, seleção, movimento inválido, arraste, teclado, dica, confirmação, persistência da sessão, vitória, imagens, mobile e toque.",
+      "PASS Spider: regras integradas, distribuir/desfazer, seleção, movimento inválido, arraste, teclado, dica, confirmação, persistência da sessão, vitória, imagens, três dificuldades, início, confirmação de troca, mobile e toque.",
     );
   } finally {
     await browser.close();

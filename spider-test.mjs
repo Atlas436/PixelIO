@@ -21,6 +21,22 @@ function verifyDeck(game) {
   const all = [...game.stock, ...game.columns.flat(), ...game.completed.flat()];
   assert.equal(all.length, 104);
   assert.equal(new Set(all.map((card) => card.id)).size, 104);
+  const expectedSuits = ["spades", "hearts", "diamonds", "clubs"].slice(
+    0,
+    game.suitCount,
+  );
+  assert.equal(new Set(all.map((card) => card.suit)).size, game.suitCount);
+  for (const suit of expectedSuits) {
+    assert.equal(
+      all.filter((card) => card.suit === suit).length,
+      104 / game.suitCount,
+    );
+    for (let rank = 1; rank <= 13; rank++)
+      assert.equal(
+        all.filter((card) => card.suit === suit && card.rank === rank).length,
+        8 / game.suitCount,
+      );
+  }
   for (let rank = 1; rank <= 13; rank++)
     assert.equal(all.filter((card) => card.rank === rank).length, 8);
 }
@@ -167,23 +183,97 @@ test("dica retorna movimento válido e não altera o jogo", () => {
 });
 
 test("conserva as 104 cartas ao longo de jogadas, distribuições e desfazer", () => {
-  for (let seed = 1; seed <= 15; seed++) {
-    let value = seed;
-    const game = new SpiderGame(() => {
-      value = (value * 1664525 + 1013904223) >>> 0;
-      return value / 4294967296;
-    });
-    for (let step = 0; step < 80 && !game.won; step++) {
-      const hint = game.hint();
-      if (step % 7 === 0 && !game.dealError) game.deal();
-      else if (hint) game.move(hint.from, hint.index, hint.to);
-      else if (!game.dealError) game.deal();
-      else break;
-      verifyDeck(game);
-      if (step % 9 === 0) {
-        game.undo();
+  for (const mode of [1, 2, 4])
+    for (let seed = 1; seed <= 5; seed++) {
+      let value = seed;
+      const game = new SpiderGame(() => {
+        value = (value * 1664525 + 1013904223) >>> 0;
+        return value / 4294967296;
+      }, mode);
+      for (let step = 0; step < 80 && !game.won; step++) {
+        const hint = game.hint();
+        if (step % 7 === 0 && !game.dealError) game.deal();
+        else if (hint) game.move(hint.from, hint.index, hint.to);
+        else if (!game.dealError) game.deal();
+        else break;
         verifyDeck(game);
+        if (step % 9 === 0) {
+          game.undo();
+          verifyDeck(game);
+        }
       }
     }
-  }
+});
+
+for (const mode of [1, 2, 4]) {
+  test(`modo ${mode}: distribuição equilibrada, novo jogo e desfazer preservam dificuldade`, () => {
+    const game = new SpiderGame(() => 0.5, mode);
+    verifyDeck(game);
+    assert.equal(game.columns.flat().length, 54);
+    assert.equal(game.stock.length, 50);
+    const before = game.snapshot();
+    game.deal();
+    game.undo();
+    assert.deepEqual(game.snapshot(), before);
+    game.newGame();
+    assert.equal(game.suitCount, mode);
+    verifyDeck(game);
+    assert.equal(game.history.length, 0);
+  });
+}
+
+test("sequência mista não move junta; carta isolada aceita destino de outro naipe", () => {
+  const game = fixture();
+  game.suitCount = 2;
+  game.columns[0] = [card(7), { ...card(6), suit: "hearts" }];
+  game.columns[1] = [{ ...card(8), suit: "hearts" }];
+  game.columns[2] = [card(7)];
+  assert(!game.canMove(0, 0, 1));
+  assert(game.canMove(0, 1, 2));
+  assert(game.move(0, 1, 2));
+  assert(!isSequence(game.columns[2], 0));
+});
+
+test("ordem K até Ás com naipes misturados não completa sequência", () => {
+  const game = fixture();
+  game.suitCount = 4;
+  game.columns[0] = Array.from({ length: 13 }, (_, i) => ({
+    ...card(13 - i),
+    suit: i % 2 ? "hearts" : "diamonds",
+  }));
+  game.collectSequences();
+  assert.equal(game.completed.length, 0);
+  assert.equal(game.columns[0].length, 13);
+});
+
+for (const mode of [2, 4]) {
+  test(`vitória no modo ${mode} exige oito sequências do mesmo naipe`, () => {
+    const game = fixture();
+    game.suitCount = mode;
+    const names = ["spades", "hearts", "diamonds", "clubs"].slice(0, mode);
+    let id = 0;
+    game.columns = Array.from({ length: 10 }, (_, i) =>
+      i < 8
+        ? Array.from({ length: 13 }, (_, rank) => ({
+            id: id++,
+            rank: 13 - rank,
+            suit: names[i % mode],
+            faceUp: true,
+          }))
+        : [],
+    );
+    game.collectSequences();
+    assert(game.won);
+    verifyDeck(game);
+    for (const pile of game.completed)
+      assert.equal(new Set(pile.map((c) => c.suit)).size, 1);
+  });
+}
+
+test("não aceita dificuldades inexistentes", () => {
+  assert.throws(() => new SpiderGame(Math.random, 3), RangeError);
+  const game = new SpiderGame(Math.random, 2);
+  const before = game.snapshot();
+  assert.throws(() => game.newGame(Math.random, 0), RangeError);
+  assert.deepEqual(game.snapshot(), before);
 });

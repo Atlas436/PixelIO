@@ -1,4 +1,30 @@
-// Regras independentes da interface: Spider de um naipe, 104 cartas.
+// Regras independentes da interface: Spider de 1, 2 ou 4 naipes, 104 cartas.
+export const suits = {
+  spades: { name: "espadas", symbol: "♠", red: false },
+  hearts: { name: "copas", symbol: "♥", red: true },
+  diamonds: { name: "ouros", symbol: "♦", red: true },
+  clubs: { name: "paus", symbol: "♣", red: false },
+};
+export const difficulties = [
+  {
+    count: 1,
+    name: "Fácil",
+    description: "Um naipe para começar.",
+    symbols: "♠",
+  },
+  {
+    count: 2,
+    name: "Médio",
+    description: "Dois naipes, novas escolhas.",
+    symbols: "♠ ♥",
+  },
+  {
+    count: 4,
+    name: "Difícil",
+    description: "Quatro naipes. O desafio completo.",
+    symbols: "♠ ♥ ♦ ♣",
+  },
+];
 export const rankName = (rank) =>
   ({ 1: "Ás", 11: "Valete", 12: "Rainha", 13: "Rei" })[rank] || String(rank);
 
@@ -17,15 +43,19 @@ export function isSequence(column, index) {
 }
 
 export class SpiderGame {
-  constructor(random = Math.random) {
-    this.newGame(random);
+  constructor(random = Math.random, suitCount = 1) {
+    this.newGame(random, suitCount);
   }
 
-  newGame(random = Math.random) {
+  newGame(random = Math.random, suitCount = this.suitCount ?? 1) {
+    if (![1, 2, 4].includes(suitCount))
+      throw new RangeError("Escolha 1, 2 ou 4 naipes.");
+    this.suitCount = suitCount;
+    const selectedSuits = Object.keys(suits).slice(0, suitCount);
     const deck = Array.from({ length: 104 }, (_, id) => ({
       id,
       rank: (id % 13) + 1,
-      suit: "spades",
+      suit: selectedSuits[Math.floor(id / 13) % suitCount],
       faceUp: false,
     }));
     for (let i = deck.length - 1; i > 0; i--) {
@@ -56,6 +86,7 @@ export class SpiderGame {
       stock: this.stock,
       completed: this.completed,
       moves: this.moves,
+      suitCount: this.suitCount,
     });
   }
 
@@ -133,11 +164,16 @@ export class SpiderGame {
           // Mover uma coluna inteira para outra vazia apenas troca sua posição.
           if (index === 0 && !this.columns[to].length) continue;
           const reveals = index > 0 && !this.columns[from][index - 1].faceUp;
+          const sameSuit =
+            this.columns[to].at(-1)?.suit === this.columns[from][index].suit;
           possibilities.push({
             from,
             index,
             to,
-            priority: (reveals ? 2 : 0) + (this.columns[to].length ? 1 : 0),
+            priority:
+              (reveals ? 4 : 0) +
+              (sameSuit ? 2 : 0) +
+              (this.columns[to].length ? 1 : 0),
           });
         }
       }

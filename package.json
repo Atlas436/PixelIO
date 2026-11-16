@@ -4,7 +4,7 @@
   "private": true,
   "description": "Sistema operacional fictício em pixel art no navegador",
   "scripts": {
-    "check": "node --check js/main.js && node --check js/apps.js && node --check js/assets.js && node --check js/desktop.js && node --check js/taskbar.js && node --check js/windows.js && node --check js/spider.js && node --check js/spider-rules.js",
+    "check": "node --check js/main.js && node --check js/apps.js && node --check js/assets.js && node --check js/desktop.js && node --check js/taskbar.js && node --check js/windows.js && node --check js/spider.js && node --check js/spider-rules.js && node --check js/spider-cards.js",
     "test": "npm run test:spider && node smoke-test.cjs && node spider-browser-test.cjs",
     "test:spider": "node --test spider-test.mjs"
   },

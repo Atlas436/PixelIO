@@ -1,56 +1,10 @@
-import { SpiderGame, isSequence, rankName } from "./spider-rules.js";
+import { SpiderGame, isSequence, suits, difficulties } from "./spider-rules.js";
 import { iconButton } from "./assets.js";
+import { cardImage, cardLabel, back } from "./spider-cards.js";
 
 // A partida permanece na memória ao fechar/reabrir a janela, até recarregar a página.
 let game;
-const asset = (name) =>
-  new URL(`../assets/baralho/${name}`, import.meta.url).href;
-const back = asset("verso-pixel-oi.png");
-// Recorte visual por CSS: os arquivos originais de 100×100 não são modificados.
-const faces = {
-  1: ["espadas.png", 28, 23, 30, 40],
-  2: ["espadas (8).png", 28, 16, 34, 67],
-  3: ["espadas (7).png", 28, 16, 34, 67],
-  4: ["espadas (6).png", 28, 16, 34, 67],
-  5: ["espadas (5).png", 28, 16, 34, 67],
-  6: ["espadas (4).png", 28, 16, 34, 67],
-  7: ["espadas (3).png", 28, 16, 34, 67],
-  8: ["espadas (2).png", 28, 16, 34, 67],
-  10: ["espadas (1).png", 28, 16, 34, 67],
-  11: ["Valete loiro espadas.png", 28, 16, 31, 63],
-  12: ["rainha espadas.png", 19, 17, 40, 66],
-  13: ["reis espadas.png", 28, 16, 31, 63],
-};
-
-function cardImage(card) {
-  const image = document.createElement("img");
-  image.alt = "";
-  image.draggable = false;
-  if (!card.faceUp) {
-    image.src = back;
-    return image;
-  }
-  const face = faces[card.rank];
-  if (!face) {
-    const provisional = document.createElement("span");
-    provisional.className = "spider-provisional";
-    provisional.innerHTML =
-      "<span>9 ♠</span><small>9 ♠</small><span>9 ♠</span>";
-    return provisional;
-  }
-  const [name, x, y, width, height] = face;
-  image.src = asset(name);
-  Object.assign(image.style, {
-    width: `${10000 / width}%`,
-    height: `${10000 / height}%`,
-    left: `${(-x / width) * 100}%`,
-    top: `${(-y / height) * 100}%`,
-  });
-  return image;
-}
-
-export function createSpider() {
-  game ||= new SpiderGame();
+function createTable(onHome) {
   let selection = null;
   let hintTarget = null;
   let dragged = null;
@@ -58,7 +12,7 @@ export function createSpider() {
   root.className = "spider-app";
   root.innerHTML = `
     <header class="spider-header">
-      <div><p class="eyebrow">PIXEL.OI / JOGOS</p><h3>Spider <span>1 NAIPE ♠</span></h3></div>
+      <div><p class="eyebrow">PIXEL.OI / JOGOS</p><h3>Spider <span data-difficulty></span></h3></div>
       <div class="spider-actions"></div>
     </header>
     <div class="spider-stats" aria-label="Estatísticas da partida">
@@ -75,7 +29,7 @@ export function createSpider() {
     <p class="spider-message" role="status" aria-live="polite"></p>
     <details class="spider-help"><summary>Como jogar</summary>
       <p>Organize as cartas de Rei até Ás. Arraste uma carta ou uma sequência em ordem; também pode clicar ou tocar na carta e depois na coluna de destino. Enter ou Espaço seleciona uma carta; os números das colunas são botões de destino.</p>
-      <p>Uma carta vai sobre outra de valor imediatamente maior. Qualquer sequência em ordem pode ir para uma coluna vazia. Complete oito sequências de Rei a Ás para vencer. As cartas cobertas viram automaticamente.</p>
+      <p>Uma carta vai sobre outra de valor imediatamente maior. Uma sequência só se move junta quando todas as cartas são do mesmo naipe e estão em ordem. Sobre outra coluna, o naipe pode ser diferente, desde que o valor seja um acima. Qualquer sequência válida pode ir para uma coluna vazia. Complete oito sequências de Rei a Ás do mesmo naipe para vencer. As cartas cobertas viram automaticamente.</p>
       <p>O monte distribui uma carta em cada coluna, até cinco vezes. Preencha as colunas vazias antes de distribuir. Desfazer reverte uma jogada inteira, inclusive cartas viradas e sequências retiradas. Dica sugere uma jogada, sem garantir a solução.</p>
       <p>Sua arte original está nas cartas. O 9 de espadas usa uma imagem provisória até recebermos o PNG. A partida fica nesta sessão ao fechar a janela; recarregar a página inicia outra.</p>
     </details>
@@ -106,7 +60,7 @@ export function createSpider() {
       selection = { from: hint.from, index: hint.index };
       hintTarget = hint.to;
       render(
-        `Dica: mova ${rankName(game.columns[hint.from][hint.index].rank)} de espadas da coluna ${hint.from + 1} para a coluna ${hint.to + 1}.`,
+        `Dica: mova ${cardLabel(game.columns[hint.from][hint.index])} da coluna ${hint.from + 1} para a coluna ${hint.to + 1}.`,
       );
     } else {
       selection = hintTarget = null;
@@ -117,6 +71,7 @@ export function createSpider() {
       );
     }
   });
+  action("menu", "Início", onHome);
   const dialog = root.querySelector(".spider-confirm");
   // O conteúdo atrás da confirmação fica inerte; ela não bloqueia o resto do desktop.
   const content = document.createElement("div");
@@ -212,6 +167,9 @@ export function createSpider() {
     message = "Monte oito sequências de Rei até Ás. Clique ou arraste para jogar.",
   ) {
     const focusedColumn = document.activeElement?.dataset.destination;
+    const mode = difficulties.find((mode) => mode.count === game.suitCount);
+    root.querySelector("[data-difficulty]").textContent =
+      `${mode.name.toUpperCase()} · ${mode.count} ${mode.count === 1 ? "NAIPE" : "NAIPES"}`;
     root.querySelector('[data-stat="completed"]').textContent =
       `${game.completed.length}/8`;
     root.querySelector('[data-stat="moves"]').textContent = game.moves;
@@ -239,7 +197,10 @@ export function createSpider() {
     for (let i = 0; i < 8; i++) {
       const slot = document.createElement("span");
       slot.className = `spider-foundation${i < game.completed.length ? " complete" : ""}`;
-      slot.textContent = i < game.completed.length ? "K—A ♠" : "♠";
+      const complete = game.completed[i];
+      const suit = complete ? suits[complete[0].suit] : null;
+      slot.textContent = suit ? `K—A ${suit.symbol}` : "—";
+      slot.classList.toggle("red-suit", !!suit?.red);
       slot.setAttribute(
         "aria-label",
         `Sequência ${i + 1}: ${i < game.completed.length ? "concluída" : "pendente"}`,
@@ -280,11 +241,12 @@ export function createSpider() {
         button.className = `spider-card${card.faceUp ? " face-up" : " face-down"}`;
         button.dataset.index = index;
         button.dataset.rank = card.faceUp ? card.rank : "";
+        button.dataset.suit = card.faceUp ? card.suit : "";
         button.style.setProperty("--card-top", top);
         button.setAttribute(
           "aria-label",
           card.faceUp
-            ? `${rankName(card.rank)} de espadas, coluna ${columnIndex + 1}, posição ${index + 1}`
+            ? `${cardLabel(card)}, coluna ${columnIndex + 1}, posição ${index + 1}`
             : `Carta virada, coluna ${columnIndex + 1}`,
         );
         button.disabled = !card.faceUp || game.won;
@@ -371,4 +333,93 @@ export function createSpider() {
   }
   render();
   return root;
+}
+
+// A abertura do aplicativo sempre mostra o início, sem perder a partida da sessão.
+export function createSpider() {
+  const host = document.createElement("div");
+  host.className = "spider-host";
+  function showTable() {
+    host.replaceChildren(createTable(showHome));
+    host.querySelector(".spider-scroll").focus({ preventScroll: true });
+  }
+  function showHome() {
+    const home = document.createElement("section");
+    home.className = "spider-home";
+    home.setAttribute("aria-label", "Início da Spider");
+    home.innerHTML = `
+      <div class="spider-home-heading"><img src="${back}" alt="" draggable="false"><div><p class="eyebrow">PIXEL.OI / JOGOS</p><h3>Spider</h3><p>Escolha seu próximo desafio.</p></div></div>
+      <div class="spider-modes" aria-label="Escolher dificuldade"></div>
+      <div class="spider-resume"></div>
+      <section class="spider-start-confirm" hidden aria-label="Confirmar nova partida"><p role="status"></p><div><button type="button" data-start="no">Cancelar</button><button type="button" data-start="yes">Começar nova partida</button></div></section>
+      <p class="spider-home-note">Dez colunas. Oito sequências. Cada naipe conta.<br>Monte sequências do mesmo naipe, de Rei até Ás.</p>`;
+    const confirmation = home.querySelector(".spider-start-confirm");
+    let pending = null;
+    function start(count) {
+      game = new SpiderGame(Math.random, count);
+      showTable();
+    }
+    for (const mode of difficulties) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "spider-mode";
+      button.dataset.mode = mode.count;
+      button.innerHTML = `<span class="spider-mode-suits" aria-hidden="true">${Object.values(
+        suits,
+      )
+        .slice(0, mode.count)
+        .map(
+          (suit) =>
+            `<span class="${suit.red ? "red-suit" : ""}">${suit.symbol}</span>`,
+        )
+        .join(
+          " ",
+        )}</span><strong>${mode.name}</strong><span>${mode.count} ${mode.count === 1 ? "naipe" : "naipes"}</span><small>${mode.description}</small>`;
+      button.addEventListener("click", () => {
+        if (!game || game.won) {
+          start(mode.count);
+          return;
+        }
+        pending = mode.count;
+        confirmation.hidden = false;
+        confirmation.querySelector("p").textContent =
+          `Iniciar no modo ${mode.name.toLowerCase()} (${mode.count} ${mode.count === 1 ? "naipe" : "naipes"})? A partida atual será substituída.`;
+        confirmation.querySelector('[data-start="no"]').focus();
+      });
+      home.querySelector(".spider-modes").append(button);
+    }
+    if (game) {
+      const mode = difficulties.find((mode) => mode.count === game.suitCount);
+      const resume = document.createElement("button");
+      resume.type = "button";
+      resume.className = "spider-resume-button";
+      resume.textContent = `Continuar partida · ${mode.name} · ${game.moves} ${game.moves === 1 ? "jogada" : "jogadas"}`;
+      resume.setAttribute("aria-label", "Continuar partida");
+      resume.addEventListener("click", showTable);
+      home.querySelector(".spider-resume").append(resume);
+    }
+    function cancel() {
+      confirmation.hidden = true;
+      home.querySelector(`[data-mode="${pending}"]`)?.focus();
+      pending = null;
+    }
+    confirmation
+      .querySelector('[data-start="no"]')
+      .addEventListener("click", cancel);
+    confirmation
+      .querySelector('[data-start="yes"]')
+      .addEventListener("click", () => {
+        if (pending !== null) start(pending);
+      });
+    home.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && !confirmation.hidden) {
+        event.stopPropagation();
+        cancel();
+      }
+    });
+    host.replaceChildren(home);
+    home.querySelector("button").focus({ preventScroll: true });
+  }
+  showHome();
+  return host;
 }
