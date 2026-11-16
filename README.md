@@ -64,17 +64,21 @@ O verso é o mesmo nos três modos. Rótulos de cartas, dicas e sequências conc
 
 ## Publicar e atualizar
 
-A Spider está na branch `jogo-spider`, criada a partir de `implementacao-inicial`. Atualmente o Pages publica diretamente de `implementacao-inicial` → `/(root)`. A branch do jogo não altera o site publicado.
+A `main` reúne a base do Pixel.OI e a Spider com as três dificuldades. As branches `implementacao-inicial` e `jogo-spider` foram preservadas como histórico do desenvolvimento.
 
-Para consolidar as funcionalidades na `main` e usar o workflow preparado:
+Para publicar sem build:
 
-1. Revise e integre a base do Pixel.OI e a Spider na `main`.
-2. Em Settings → Pages do repositório, selecione **GitHub Actions** como origem.
-3. Envie as alterações para `main`: o workflow publica HTML, os dois CSS, scripts e recursos. Ele também pode ser executado manualmente em Actions.
-4. Confira o endereço retornado pelo workflow; o endereço atual é https://atlas436.github.io/PixelIO/.
-5. Para atualizar, desenvolva em uma branch, revise e integre em `main`.
+1. Abra **Settings → Pages** no GitHub.
+2. Mantenha **Deploy from a branch** como origem.
+3. Selecione **main** e **/(root)**, depois clique em **Save**.
+4. Aguarde o processo **pages build and deployment** terminar em Actions.
+5. Abra https://atlas436.github.io/PixelIO/.
 
-Esta branch não muda a configuração de Pages nem publica o jogo automaticamente. Os caminhos são relativos e funcionam sob `/PixelIO/` sem configuração de base de build.
+As próximas atualizações publicam automaticamente quando forem integradas na `main`. Desenvolva cada novo aplicativo numa branch criada a partir da `main`, teste e faça o merge quando estiver pronto.
+
+O workflow `.github/workflows/pages.yml` é uma alternativa de publicação manual: para usá-lo, selecione GitHub Actions como origem do Pages e execute **Publicar Pixel.OI → Run workflow** na branch `main`. Ele não roda automaticamente para não interferir na publicação direta por branch.
+
+Os caminhos são relativos e funcionam sob `/PixelIO/` sem configuração de base de build. A alteração da origem do Pages deve ser feita nas configurações; criar a `main` não muda essa origem automaticamente.
 
 ## Verificação
 
