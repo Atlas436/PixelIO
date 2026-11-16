@@ -48,10 +48,10 @@ export class WindowManager {
       maximize,
       minimized: false,
       maximized: false,
-      x: 160 + offset,
-      y: 40 + offset,
-      width: 560,
-      height: 360,
+      x: app.id === "solitaire" ? 40 : 160 + offset,
+      y: app.id === "solitaire" ? 12 : 40 + offset,
+      width: app.id === "solitaire" ? 1040 : 560,
+      height: app.id === "solitaire" ? 650 : 360,
       order: 0,
     };
     this.windows.set(app.id, state);
