@@ -1,6 +1,6 @@
 # Pixel.OI
 
-Sistema operacional fictício em pixel art, executado inteiramente no navegador. Primeira etapa: apresentação, boot simulado, desktop, menu com dez aplicativos e gerenciador reutilizável de janelas. Não há servidor de aplicação, autenticação, Supabase ou IA nesta etapa.
+Sistema operacional fictício em pixel art, executado inteiramente no navegador. Primeira etapa: apresentação, boot simulado, desktop, menu com dez aplicativos e gerenciador reutilizável de janelas. Agora inclui Paciência Spider com três dificuldades. Não há servidor de aplicação, autenticação, Supabase ou IA nesta etapa.
 
 ## Executar localmente
 
@@ -14,7 +14,11 @@ Na pasta do projeto, execute `python3 -m http.server 8080` e abra http://localho
 - `js/desktop.js`: seleção e abertura dos atalhos.
 - `js/taskbar.js`: aplicativos abertos, menu, relógio e painéis.
 - `js/windows.js`: abertura, foco, sobreposição, arraste e controles das janelas.
-- `js/apps.js`: catálogo e conteúdo temporário dos dez aplicativos.
+- `js/apps.js`: catálogo, abertura da Spider e conteúdo temporário dos outros aplicativos.
+- `js/spider-rules.js`: regras e dificuldades da Spider, independentes da interface.
+- `js/spider-cards.js`: imagens, naipes e recortes visuais do baralho.
+- `js/spider.js` e `spider.css`: mesa e interação do jogo.
+- `assets/baralho/`: cartas originais dos quatro naipes e verso novo.
 - `js/assets.js`: integração dos PNGs autorais.
 - `assets/`: recursos originais fornecidos pelo autor.
 - `.github/workflows/pages.yml`: publicação pelo GitHub Pages.
@@ -25,7 +29,7 @@ Os PNGs foram copiados das pastas BotõesBase, BotõesAdicionais e Tela de Fundo
 
 Os controles usam as imagens normal, hover e pressed existentes. Ícones auxiliares brancos usam máscaras CSS com o PNG original para receber a cor oficial. Ampliamos os botões pixel art com `image-rendering: pixelated`.
 
-Os dez ícones definitivos dos aplicativos ainda não foram fornecidos: suas iniciais são espaços reservados discretos. O botão de restaurar reutiliza o PNG de maximizar, com rótulo acessível atualizado. A pasta Baralho não foi acessada nem importada; o jogo Paciência será desenvolvido numa etapa futura.
+Paciência usa o verso das cartas como ícone no desktop e no menu de aplicativos. Os outros nove aplicativos usam suas iniciais como espaços reservados até receberem os ícones definitivos. O botão de restaurar reutiliza o PNG de maximizar, com rótulo acessível atualizado. As cartas de espadas da pasta Baralho foram importadas com autorização para a Spider. O verso `verso-pixel-oi.png` foi criado para este jogo. Os PNGs originais foram preservados; um recorte por CSS remove somente as margens transparentes na exibição. Falta o 9 de espadas no material fornecido: por enquanto ele é representado por uma carta tipográfica provisória “9 ♠”. Copas, ouros e paus também foram importados para os modos médio e difícil. Os nomes e bytes dos recursos originais foram mantidos.
 
 Paleta: fundo `#1F1833`, normal `#94D2D4`, hover `#63C2C9`, pressed `#4C93AD`. Relógio, idioma e notificações usam a cor normal. `POR` indica o idioma da interface, sem seletor de tradução nesta etapa.
 
@@ -35,17 +39,42 @@ Clique em Iniciar Pixel.OI e aguarde a simulação visual do boot. No desktop, u
 
 Arraste uma janela pela barra de título. Use os PNGs para minimizar, maximizar/restaurar e fechar; duplo clique no título também maximiza/restaura. A barra de tarefas restaura janelas minimizadas e alterna o foco; clicar no aplicativo ativo o minimiza. Janelas são mantidas na área visível, inclusive ao redimensionar a tela.
 
-Os painéis fecham com Escape ou clique fora. Energia → Encerrar Pixel.OI retorna à apresentação e fecha as janelas. O relógio segue o horário local do navegador. Volume é um controle reservado aos futuros sons internos; não controla o volume do computador. Aplicativos exibem somente conteúdo temporário.
+Os painéis fecham com Escape ou clique fora. Energia → Encerrar Pixel.OI retorna à apresentação e fecha as janelas. O relógio segue o horário local do navegador. Volume é um controle reservado aos futuros sons internos; não controla o volume do computador. Paciência abre a Spider; os demais aplicativos exibem conteúdo temporário.
+
+## Paciência Spider — dificuldades
+
+Abra Paciência pelo desktop ou pelo menu e escolha a dificuldade no início:
+
+- **Fácil — 1 naipe:** espadas, oito cópias de cada valor.
+- **Médio — 2 naipes:** espadas e copas, quatro cópias de cada valor por naipe.
+- **Difícil — 4 naipes:** espadas, copas, ouros e paus, duas cópias de cada valor por naipe.
+
+Todos os modos têm 104 cartas: dez colunas com 54 cartas e um monte com 50, dividido em cinco distribuições. As primeiras quatro colunas recebem seis cartas e as demais cinco; somente a última carta de cada coluna começa descoberta.
+
+- Arraste uma carta livre ou uma sequência decrescente **do mesmo naipe** para uma carta imediatamente maior, ou para uma coluna vazia. O naipe do destino pode ser diferente, mas isso não forma uma sequência que possa ser movida em conjunto. Também pode selecionar com clique/toque e clicar/tocar no destino.
+- Pelo teclado, Enter/Espaço seleciona uma carta. Use Tab para chegar ao botão numerado da coluna de destino e Enter/Espaço para mover. Escape cancela a seleção.
+- Cada sequência completa de Rei a Ás **do mesmo naipe** é retirada automaticamente; oito sequências vencem a partida. As cartas liberadas viram automaticamente.
+- Distribuir coloca uma carta em cada coluna. Nenhuma coluna pode estar vazia. O monte não é reciclado.
+- Desfazer restaura toda a ação anterior, incluindo distribuições, cartas viradas e sequências retiradas. Dica sugere uma transferência útil; não garante que a partida tenha solução.
+- A pontuação começa em 500, perde um ponto por jogada/distribuição e ganha 100 por sequência completa. Desfazer restaura a pontuação anterior.
+- Novo jogo pede confirmação e mantém a dificuldade atual. **Início** volta à escolha de dificuldade sem perder a partida. **Continuar partida** retoma o jogo; escolher outra dificuldade só substitui a partida após confirmação. Fechar, minimizar ou reabrir a janela preserva a partida nesta sessão; recarregar a página perde o progresso. Não há salvamento em servidor ou no navegador.
+- Em telas pequenas, role a mesa horizontalmente para acessar as dez colunas. Também é possível maximizar a janela.
+
+O verso é o mesmo nos três modos. Rótulos de cartas, dicas e sequências concluídas identificam o naipe correspondente. O menu inicial é exibido ao reabrir a janela e oferece continuar a partida da sessão.
 
 ## Publicar e atualizar
 
-1. Revise a branch `implementacao-inicial` antes de integrar na `main`.
-2. Em Settings → Pages do repositório, selecione **GitHub Actions** como origem.
-3. Ao enviar alterações para `main`, o workflow publica os arquivos estáticos. Também pode ser executado manualmente em Actions, selecionando a branch desejada.
-4. O endereço esperado é https://atlas436.github.io/PixelIO/ (confirme o endereço retornado pelo workflow).
-5. Para atualizar, faça alterações em uma branch, revise e integre em `main`. A publicação será atualizada automaticamente.
+A Spider está na branch `jogo-spider`, criada a partir de `implementacao-inicial`. Atualmente o Pages publica diretamente de `implementacao-inicial` → `/(root)`. A branch do jogo não altera o site publicado.
 
-Nenhuma configuração de Pages ou publicação é ativada automaticamente por esta entrega. Os caminhos são relativos e funcionam sob `/PixelIO/` sem configuração de base de build.
+Para consolidar as funcionalidades na `main` e usar o workflow preparado:
+
+1. Revise e integre a base do Pixel.OI e a Spider na `main`.
+2. Em Settings → Pages do repositório, selecione **GitHub Actions** como origem.
+3. Envie as alterações para `main`: o workflow publica HTML, os dois CSS, scripts e recursos. Ele também pode ser executado manualmente em Actions.
+4. Confira o endereço retornado pelo workflow; o endereço atual é https://atlas436.github.io/PixelIO/.
+5. Para atualizar, desenvolva em uma branch, revise e integre em `main`.
+
+Esta branch não muda a configuração de Pages nem publica o jogo automaticamente. Os caminhos são relativos e funcionam sob `/PixelIO/` sem configuração de base de build.
 
 ## Verificação
 
@@ -53,4 +82,4 @@ Nenhuma configuração de Pages ou publicação é ativada automaticamente por e
 
 O teste `smoke-test.cjs` cobre apresentação e boot, seleção, abertura dos dez apps, prevenção de duplicatas, foco, arraste, minimizar/restaurar, maximizar/restaurar, fechar, menus, notificações, volume, imagens, tela de 360×640, encerramento e reinício. Playwright é dependência apenas de desenvolvimento.
 
-Validação desta entrega: teste funcional aprovado no Chromium em 1366×768 e 360×640, sintaxe dos seis módulos aprovada e 101 PNGs originais verificados. Não há etapa de build porque o navegador recebe HTML, CSS e JavaScript diretamente. Publicação remota depende de ativar GitHub Pages nas configurações do repositório.
+`npm run test:spider` executa os 20 testes de regras sem dependências externas. `npm test` executa também o teste do desktop e `spider-browser-test.cjs`, com distribuição/desfazer, movimentação por clique, arraste e teclado, dicas, confirmação, preservação da sessão, vitória, imagens, toque, escolha das três dificuldades e cancelamento da troca de modo. Os testes usam um servidor estático aberto em http://localhost:8080. O baralho permanece com 104 cartas após jogadas, distribuições e desfazer, verificado em partidas com embaralhamentos determinísticos. Não há etapa de build porque o navegador recebe HTML, CSS e JavaScript diretamente. Publicação remota depende de ativar GitHub Pages nas configurações do repositório.

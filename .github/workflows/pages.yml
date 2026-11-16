@@ -22,7 +22,7 @@ jobs:
       - name: Separar arquivos públicos
         run: |
           mkdir _site
-          cp index.html style.css _site/
+          cp index.html style.css spider.css _site/
           cp -r js assets _site/
       - uses: actions/upload-pages-artifact@v3
         with:
