@@ -1,4 +1,6 @@
-// Catálogo: os aplicativos completos e seus ícones definitivos virão depois.
+import { createSpider } from "./spider.js";
+
+// Catálogo: os ícones definitivos dos aplicativos virão depois.
 export const apps = [
   { id: "files", name: "Arquivos", initials: "AR" },
   { id: "music", name: "Música", initials: "MU" },
@@ -21,6 +23,7 @@ export function placeholder(app) {
 }
 
 export function appContent(app) {
+  if (app.id === "solitaire") return createSpider();
   const content = document.createElement("div");
   content.className = "window-body";
   const eyebrow = document.createElement("p");
