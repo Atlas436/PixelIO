@@ -14,7 +14,12 @@ Na pasta do projeto, execute `python3 -m http.server 8080` e abra http://localho
 - `js/desktop.js`: seleção e abertura dos atalhos.
 - `js/taskbar.js`: aplicativos abertos, menu, relógio e painéis.
 - `js/windows.js`: abertura, foco, sobreposição, arraste e controles das janelas.
-- `js/apps.js`: catálogo, abertura da Spider e conteúdo temporário dos outros aplicativos.
+- `js/apps.js`: catálogo, abertura da Spider, Configurações e conteúdo temporário dos outros aplicativos.
+- `js/settings.js`: preferências e janela de Configurações.
+- `js/taskbar-visibility.js`: ocultação e revelação da barra.
+- `js/notifications.js`: avisos internos dos aplicativos.
+- `js/spider-drag.js`: arraste da mesa por mouse, caneta e toque.
+- `IDEIAS.md`: ideias guardadas para próximas etapas, incluindo o app Música.
 - `js/spider-rules.js`: regras e dificuldades da Spider, independentes da interface.
 - `js/spider-cards.js`: imagens, naipes e recortes visuais do baralho.
 - `js/spider.js` e `spider.css`: mesa e interação do jogo.
@@ -29,7 +34,7 @@ Os PNGs foram copiados das pastas BotõesBase, BotõesAdicionais e Tela de Fundo
 
 Os controles usam as imagens normal, hover e pressed existentes. Ícones auxiliares brancos usam máscaras CSS com o PNG original para receber a cor oficial. Ampliamos os botões pixel art com `image-rendering: pixelated`.
 
-Paciência usa o verso das cartas como ícone no desktop e no menu de aplicativos. Os outros nove aplicativos usam suas iniciais como espaços reservados até receberem os ícones definitivos. O botão de restaurar reutiliza o PNG de maximizar, com rótulo acessível atualizado. As cartas de espadas da pasta Baralho foram importadas com autorização para a Spider. O verso `verso-pixel-oi.png` foi criado para este jogo. Os PNGs originais foram preservados; um recorte por CSS remove somente as margens transparentes na exibição. Falta o 9 de espadas no material fornecido: por enquanto ele é representado por uma carta tipográfica provisória “9 ♠”. Copas, ouros e paus também foram importados para os modos médio e difícil. Os nomes e bytes dos recursos originais foram mantidos.
+Paciência usa o verso das cartas como ícone no desktop e no menu de aplicativos. Configurações usa a engrenagem autoral. Os outros oito aplicativos usam suas iniciais como espaços reservados até receberem os ícones definitivos. O botão de restaurar reutiliza o PNG de maximizar, com rótulo acessível atualizado. As cartas de espadas da pasta Baralho foram importadas com autorização para a Spider. O verso `verso-pixel-oi.png` foi criado para este jogo. Os PNGs originais foram preservados; um recorte por CSS remove somente as margens transparentes na exibição. Falta o 9 de espadas no material fornecido: por enquanto ele é representado por uma carta tipográfica provisória “9 ♠”. Copas, ouros e paus também foram importados para os modos médio e difícil. Os nomes e bytes dos recursos originais foram mantidos.
 
 Paleta: fundo `#1F1833`, normal `#94D2D4`, hover `#63C2C9`, pressed `#4C93AD`. Relógio, idioma e notificações usam a cor normal. `POR` indica o idioma da interface, sem seletor de tradução nesta etapa.
 
@@ -39,7 +44,18 @@ Clique em Iniciar Pixel.OI e aguarde a simulação visual do boot. No desktop, u
 
 Arraste uma janela pela barra de título. Use os PNGs para minimizar, maximizar/restaurar e fechar; duplo clique no título também maximiza/restaura. A barra de tarefas restaura janelas minimizadas e alterna o foco; clicar no aplicativo ativo o minimiza. Janelas são mantidas na área visível, inclusive ao redimensionar a tela.
 
-Os painéis fecham com Escape ou clique fora. Energia → Encerrar Pixel.OI retorna à apresentação e fecha as janelas. O relógio segue o horário local do navegador. Volume é um controle reservado aos futuros sons internos; não controla o volume do computador. Paciência abre a Spider; os demais aplicativos exibem conteúdo temporário.
+Os painéis fecham com Escape ou clique fora. Energia → Encerrar Pixel.OI retorna à apresentação e fecha as janelas. O relógio segue o horário local do navegador. Volume é um controle reservado aos futuros sons internos; não controla o volume do computador. Paciência abre a Spider e Configurações contém as preferências da barra; os demais aplicativos exibem conteúdo temporário.
+
+## Configurações e barra de tarefas
+
+Abra Configurações pela engrenagem no desktop ou no menu e ative **Ocultar automaticamente**. A opção fica desligada inicialmente e é salva no navegador. Se o armazenamento estiver bloqueado, ela funciona durante a sessão e a interface informa que não foi salva.
+
+- Leve o mouse até a borda inferior para mostrar a barra. Ela se recolhe após sair, com uma pequena tolerância para evitar movimentos acidentais.
+- No toque, use a alça inferior. Pelo teclado, **Alt + T** leva o foco à barra.
+- A barra fica visível enquanto houver foco em seus controles ou um de seus menus estiver aberto.
+- Quando oculta, as janelas usam o espaço liberado. Desligar a opção restaura a área reservada da barra.
+- Avisos internos de aplicativos revelam a barra por cinco segundos e mostram indicadores de mensagens não lidas, sem roubar o foco. O sino abre a lista; consultar a lista marca os avisos como lidos.
+- A vitória da Spider gera uma notificação. As notificações são internas ao Pixel.OI e ficam somente na sessão; não usam avisos do sistema operacional.
 
 ## Paciência Spider — dificuldades
 
@@ -51,7 +67,7 @@ Abra Paciência pelo desktop ou pelo menu e escolha a dificuldade no início:
 
 Todos os modos têm 104 cartas: dez colunas com 54 cartas e um monte com 50, dividido em cinco distribuições. As primeiras quatro colunas recebem seis cartas e as demais cinco; somente a última carta de cada coluna começa descoberta.
 
-- Arraste uma carta livre ou uma sequência decrescente **do mesmo naipe** para uma carta imediatamente maior, ou para uma coluna vazia. O naipe do destino pode ser diferente, mas isso não forma uma sequência que possa ser movida em conjunto. Também pode selecionar com clique/toque e clicar/tocar no destino.
+- Arraste uma carta livre ou uma sequência decrescente **do mesmo naipe** para uma carta imediatamente maior, ou para uma coluna vazia. O naipe do destino pode ser diferente, mas isso não forma uma sequência que possa ser movida em conjunto. O arraste acompanha o ponteiro com todas as cartas da sequência e anima o encaixe; um destino inválido devolve as cartas sem consumir uma jogada. Escape cancela o arraste. Também pode selecionar com clique/toque e clicar/tocar no destino.
 - Pelo teclado, Enter/Espaço seleciona uma carta. Use Tab para chegar ao botão numerado da coluna de destino e Enter/Espaço para mover. Escape cancela a seleção.
 - Cada sequência completa de Rei a Ás **do mesmo naipe** é retirada automaticamente; oito sequências vencem a partida. As cartas liberadas viram automaticamente.
 - Distribuir coloca uma carta em cada coluna. Nenhuma coluna pode estar vazia. O monte não é reciclado.
@@ -83,6 +99,8 @@ Os caminhos são relativos e funcionam sob `/PixelIO/` sem configuração de bas
 ## Verificação
 
 `npm run check` verifica a sintaxe de todos os módulos, sem instalar dependências. Para o teste funcional, execute `npm ci` e `npx playwright install chromium`, deixe o servidor local aberto em outro terminal e execute `npm test`. Se o Chromium estiver em `/usr/bin/chromium`, ele será usado automaticamente; para outro caminho, defina `CHROMIUM_PATH`. Para outro endereço local, defina `PIXEL_URL`.
+
+`taskbar-browser-test.cjs` verifica ocultação por mouse, toque e teclado, menus, notificações, preservação do foco, persistência, armazenamento bloqueado e a área útil das janelas.
 
 O teste `smoke-test.cjs` cobre apresentação e boot, seleção, abertura dos dez apps, prevenção de duplicatas, foco, arraste, minimizar/restaurar, maximizar/restaurar, fechar, menus, notificações, volume, imagens, tela de 360×640, encerramento e reinício. Playwright é dependência apenas de desenvolvimento.
 

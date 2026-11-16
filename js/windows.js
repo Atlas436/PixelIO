@@ -51,13 +51,18 @@ export class WindowManager {
       x: app.id === "solitaire" ? 40 : 160 + offset,
       y: app.id === "solitaire" ? 12 : 40 + offset,
       width: app.id === "solitaire" ? 1040 : 560,
-      height: app.id === "solitaire" ? 650 : 360,
+      height: app.id === "solitaire" ? 650 : app.id === "settings" ? 480 : 360,
       order: 0,
     };
     this.windows.set(app.id, state);
     this.layer.append(element);
     this.fit(state);
-    element.addEventListener("pointerdown", () => this.focus(app.id, false));
+    element.addEventListener("pointerdown", (event) => {
+      const control = event.target.closest(
+        "button, input, textarea, select, a[href], summary, [tabindex]",
+      );
+      this.focus(app.id, !control || control === element);
+    });
     element.addEventListener("focusin", () => {
       if (this.activeId !== app.id) this.focus(app.id, false);
     });

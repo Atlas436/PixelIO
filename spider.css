@@ -186,10 +186,10 @@
 .spider-card:disabled {
   cursor: default;
 }
-.spider-card[draggable="true"] {
+.spider-card[data-movable="true"] {
   cursor: grab;
 }
-.spider-card[draggable="true"]:active {
+.spider-card[data-movable="true"]:active {
   cursor: grabbing;
 }
 .spider-card.face-up:hover {
@@ -491,4 +491,28 @@
   .spider-mode small {
     grid-column: 1;
   }
+}
+
+/* O conteúdo da carta não herda as cores de hover dos botões. */
+.spider-provisional {
+  color: #111;
+}
+.spider-provisional.red-suit {
+  color: #d7566c;
+}
+.spider-card[data-movable="true"] {
+  touch-action: none;
+}
+.spider-card.drag-source {
+  opacity: 0.22;
+}
+.spider-drag-ghost {
+  position: fixed;
+  z-index: 4000;
+  pointer-events: none;
+  will-change: transform;
+}
+.spider-drag-ghost .spider-card {
+  box-shadow: 5px 8px 10px #0006;
+  cursor: grabbing;
 }

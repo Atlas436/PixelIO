@@ -1,5 +1,7 @@
 import { SpiderGame, isSequence, suits, difficulties } from "./spider-rules.js";
 import { iconButton } from "./assets.js";
+import { setupSpiderDrag } from "./spider-drag.js";
+import { notifyApp } from "./notifications.js";
 import { cardImage, cardLabel, back } from "./spider-cards.js";
 
 // A partida permanece na memória ao fechar/reabrir a janela, até recarregar a página.
@@ -7,7 +9,7 @@ let game;
 function createTable(onHome) {
   let selection = null;
   let hintTarget = null;
-  let dragged = null;
+  let wasWon = game.won;
   const root = document.createElement("div");
   root.className = "spider-app";
   root.innerHTML = `
@@ -71,7 +73,10 @@ function createTable(onHome) {
       );
     }
   });
-  action("menu", "Início", onHome);
+  action("menu", "Início", () => {
+    drag.cancel();
+    onHome();
+  });
   const dialog = root.querySelector(".spider-confirm");
   // O conteúdo atrás da confirmação fica inerte; ela não bloqueia o resto do desktop.
   const content = document.createElement("div");
@@ -163,9 +168,22 @@ function createTable(onHome) {
       ?.focus({ preventScroll: true });
   }
 
+  const drag = setupSpiderDrag(root, {
+    canMove: (from, index, to) => game.canMove(from, index, to),
+    onDrop(from, index, to) {
+      selection = { from, index };
+      tryMove(to);
+    },
+    onInvalid() {
+      status.textContent =
+        "Solte sobre uma coluna válida. As cartas voltaram ao lugar.";
+    },
+  });
+
   function render(
     message = "Monte oito sequências de Rei até Ás. Clique ou arraste para jogar.",
   ) {
+    drag.cancel();
     const focusedColumn = document.activeElement?.dataset.destination;
     const mode = difficulties.find((mode) => mode.count === game.suitCount);
     root.querySelector("[data-difficulty]").textContent =
@@ -250,7 +268,9 @@ function createTable(onHome) {
             : `Carta virada, coluna ${columnIndex + 1}`,
         );
         button.disabled = !card.faceUp || game.won;
-        button.draggable = !game.won && isSequence(cards, index);
+        button.draggable = false;
+        button.dataset.movable = String(!game.won && isSequence(cards, index));
+        button.dataset.cardId = card.id;
         button.setAttribute(
           "aria-pressed",
           String(selection?.from === columnIndex && index >= selection.index),
@@ -264,35 +284,6 @@ function createTable(onHome) {
           event.stopPropagation();
           selectCard(columnIndex, index);
         });
-        button.addEventListener("dragstart", (event) => {
-          if (!button.draggable) {
-            event.preventDefault();
-            return;
-          }
-          dragged = { from: columnIndex, index };
-          event.dataTransfer.effectAllowed = "move";
-          event.dataTransfer.setData("text/plain", "pixel-spider");
-          for (const target of columns.children)
-            target.classList.toggle(
-              "valid-target",
-              game.canMove(columnIndex, index, Number(target.dataset.column)),
-            );
-        });
-        button.addEventListener("dragend", () => {
-          dragged = null;
-          for (const target of columns.children)
-            target.classList.remove("drop-target");
-          for (const target of columns.children)
-            target.classList.toggle(
-              "valid-target",
-              !!selection &&
-                game.canMove(
-                  selection.from,
-                  selection.index,
-                  Number(target.dataset.column),
-                ),
-            );
-        });
         pile.append(button);
         top += card.faceUp ? 28 : 12;
       });
@@ -302,30 +293,18 @@ function createTable(onHome) {
       );
       pile.addEventListener("click", () => tryMove(columnIndex));
       column.append(pile);
-      column.addEventListener("dragover", (event) => {
-        if (!dragged || !game.canMove(dragged.from, dragged.index, columnIndex))
-          return;
-        event.preventDefault();
-        event.dataTransfer.dropEffect = "move";
-        column.classList.add("drop-target");
-      });
-      column.addEventListener("dragleave", (event) => {
-        if (!column.contains(event.relatedTarget))
-          column.classList.remove("drop-target");
-      });
-      column.addEventListener("drop", (event) => {
-        event.preventDefault();
-        if (!dragged) return;
-        selection = dragged;
-        dragged = null;
-        tryMove(columnIndex);
-      });
       columns.append(column);
     });
     status.textContent = game.won
       ? "Você venceu! As oito sequências estão completas. Que tal outra partida?"
       : message;
     root.classList.toggle("spider-won", game.won);
+    if (game.won && !wasWon)
+      notifyApp(
+        "solitaire",
+        "Você venceu a Spider! As oito sequências estão completas.",
+      );
+    wasWon = game.won;
     if (focusedColumn !== undefined)
       columns
         .querySelector(`[data-destination="${focusedColumn}"]`)

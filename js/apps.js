@@ -1,4 +1,6 @@
 import { createSpider } from "./spider.js";
+import { createSettings } from "./settings.js";
+import { pixelArt } from "./assets.js";
 
 // Catálogo: Paciência usa o verso das cartas; os outros ícones virão depois.
 export const apps = [
@@ -15,10 +17,18 @@ export const apps = [
 ];
 
 export function placeholder(app) {
+  if (app.id === "settings") {
+    const icon = pixelArt("configuracoes");
+    icon.classList.add("settings-icon");
+    return icon;
+  }
   if (app.id === "solitaire") {
     const icon = document.createElement("img");
     icon.className = "app-icon";
-    icon.src = new URL("../assets/baralho/verso-pixel-oi.png", import.meta.url).href;
+    icon.src = new URL(
+      "../assets/baralho/verso-pixel-oi.png",
+      import.meta.url,
+    ).href;
     icon.alt = "";
     icon.draggable = false;
     return icon;
@@ -32,6 +42,7 @@ export function placeholder(app) {
 
 export function appContent(app) {
   if (app.id === "solitaire") return createSpider();
+  if (app.id === "settings") return createSettings();
   const content = document.createElement("div");
   content.className = "window-body";
   const eyebrow = document.createElement("p");

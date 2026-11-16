@@ -595,3 +595,175 @@ noscript {
   width: 26px;
   height: 26px;
 }
+
+/* Ocultação da barra, preferências e notificações internas. */
+#taskbar {
+  transition: transform 180ms ease;
+}
+#system.taskbar-autohide #workspace {
+  bottom: 0;
+}
+#system.taskbar-autohide.taskbar-hidden #taskbar {
+  transform: translateY(100%);
+}
+#taskbar-reveal {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 10px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  z-index: 2001;
+  visibility: hidden;
+  pointer-events: none;
+}
+#taskbar-reveal::after {
+  content: "";
+  display: block;
+  width: 56px;
+  height: 3px;
+  margin: 5px auto 0;
+  background: var(--normal);
+}
+#system.taskbar-autohide.taskbar-hidden #taskbar-reveal {
+  visibility: visible;
+  pointer-events: auto;
+}
+#taskbar-reveal:focus-visible {
+  outline-offset: -2px;
+}
+.settings-app {
+  padding: 24px;
+  overflow: auto;
+  flex: 1;
+  min-height: 0;
+}
+.settings-heading {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 24px;
+}
+.settings-heading h3 {
+  margin: 0;
+  font-size: 24px;
+}
+.settings-heading .eyebrow {
+  font-size: 9px;
+  margin-bottom: 8px;
+  letter-spacing: 2px;
+}
+.settings-app h4 {
+  font-size: 14px;
+  color: var(--normal);
+  margin: 0 0 14px;
+}
+.settings-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 14px;
+  background: #94d2d40a;
+  border: 1px solid var(--line);
+  cursor: pointer;
+}
+.settings-option strong {
+  font-size: 12px;
+  font-weight: normal;
+}
+.settings-option small {
+  display: block;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.6;
+  margin-top: 8px;
+}
+.settings-option input {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  accent-color: var(--normal);
+  cursor: pointer;
+}
+.settings-app > p {
+  margin-top: 16px;
+  color: var(--muted);
+  line-height: 1.8;
+  font-size: 11px;
+}
+.settings-app .settings-save-status {
+  color: var(--normal);
+}
+.desktop-app .settings-icon {
+  width: 40px;
+  height: 40px;
+}
+.menu-app .settings-icon {
+  width: 26px;
+  height: 26px;
+}
+.has-notification {
+  position: relative;
+}
+.has-notification::after {
+  content: "";
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  background: var(--normal);
+  margin-left: 6px;
+  border-radius: 50%;
+}
+#notifications-toggle.has-notification::after {
+  position: absolute;
+  top: 3px;
+  right: 1px;
+  margin: 0;
+}
+#notification-list {
+  display: grid;
+  gap: 10px;
+}
+#notification-list .notification-entry {
+  padding: 12px;
+  text-align: left;
+  border: 1px solid var(--line);
+  width: 100%;
+}
+.notification-entry strong {
+  display: block;
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+.notification-entry span {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+@media (pointer: coarse) {
+  #taskbar-reveal {
+    height: 24px;
+  }
+  #taskbar-reveal::after {
+    margin-top: 17px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #taskbar {
+    transition: none;
+  }
+}
