@@ -1,5 +1,8 @@
 // Os nomes originais do Drive foram preservados, inclusive a extensão dupla.
 const asset = (name) => new URL(`../assets/${name}`, import.meta.url).href;
+const originalNames = {
+  volume_baixo_normal: 'volume_baixo_normal.png (2).png',
+};
 
 export function pixelArt(name) {
   const span = document.createElement("span");
@@ -7,7 +10,7 @@ export function pixelArt(name) {
   span.setAttribute("aria-hidden", "true");
   for (const state of ["normal", "hover", "pressed"]) {
     const image = document.createElement("img");
-    image.src = asset(`${name}_${state}.png.png`);
+    image.src = asset(originalNames[`${name}_${state}`] || `${name}_${state}.png.png`);
     image.alt = "";
     image.className = state;
     image.draggable = false;
