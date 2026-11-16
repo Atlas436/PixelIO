@@ -84,7 +84,7 @@
         aria-label="Notificações"
       >
         <h2>Notificações</h2>
-        <p>Nenhuma notificação por aqui.</p>
+        <div id="notification-list"><p>Nenhuma notificação por aqui.</p></div>
       </section>
       <section
         id="power-panel"
@@ -95,6 +95,19 @@
         <h2>Até a próxima?</h2>
         <button id="shutdown">Encerrar Pixel.OI</button>
       </section>
+      <button
+        id="taskbar-reveal"
+        type="button"
+        aria-label="Mostrar barra de tarefas"
+        aria-controls="taskbar"
+        aria-expanded="true"
+      ></button>
+      <div
+        id="notification-announcement"
+        class="sr-only"
+        role="status"
+        aria-live="polite"
+      ></div>
       <footer id="taskbar" aria-label="Barra de tarefas">
         <button
           id="menu-toggle"

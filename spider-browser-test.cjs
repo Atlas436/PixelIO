@@ -118,7 +118,7 @@ const fs = require("node:fs");
         this.columns = [
           [c(10, false, 100), c(7, true, 101), c(6, true, 102)],
           [c(8, true, 103)],
-          [c(4, true, 104)],
+          [c(9, true, 104)],
           [],
           [],
           [],
@@ -159,6 +159,36 @@ const fs = require("node:fs");
     assert.equal(await app.locator(".face-down").count(), 0);
     await app.getByRole("button", { name: "Desfazer", exact: true }).click();
     assert.equal(await app.locator(".face-down").count(), 1);
+    // O 9 mantém seu número preto durante hover.
+    const nine = app.locator('[data-rank="9"] .spider-provisional');
+    await nine.hover();
+    assert.equal(
+      await nine.evaluate((e) => getComputedStyle(e).color),
+      "rgb(17, 17, 17)",
+    );
+    // Uma pilha inteira acompanha o ponteiro; soltar fora de um destino válido não joga.
+    const sourceBox = await source.boundingBox();
+    await page.mouse.move(sourceBox.x + 10, sourceBox.y + 8);
+    await page.mouse.down();
+    await page.mouse.move(sourceBox.x + 60, sourceBox.y + 30, { steps: 4 });
+    assert.equal(
+      await page.locator(".spider-drag-ghost .spider-card").count(),
+      2,
+    );
+    await page.mouse.move(1200, 700);
+    await page.mouse.up();
+    assert.equal(await app.locator('[data-stat="moves"]').textContent(), "0");
+    await page.waitForFunction(
+      () => !document.querySelector(".spider-drag-ghost"),
+    );
+    // Escape cancela o arraste sem fazer uma jogada nem deixar cartas flutuando.
+    await page.mouse.move(sourceBox.x + 10, sourceBox.y + 8);
+    await page.mouse.down();
+    await page.mouse.move(sourceBox.x + 45, sourceBox.y + 30, { steps: 3 });
+    await page.keyboard.press("Escape");
+    await page.mouse.up();
+    assert.equal(await page.locator(".spider-drag-ghost").count(), 0);
+    assert.equal(await app.locator('[data-stat="moves"]').textContent(), "0");
     // Arrastar uma sequência.
     await source.dragTo(app.locator('[data-column="1"] .spider-pile'), {
       sourcePosition: { x: 10, y: 8 },
@@ -219,6 +249,23 @@ const fs = require("node:fs");
       await app.locator(".spider-message").textContent(),
       /Você venceu/,
     );
+    assert(
+      await page
+        .locator("#notifications-toggle")
+        .evaluate((e) => e.classList.contains("has-notification")),
+    );
+    const notificationsBefore = await page.evaluate(async () => {
+      const { getNotifications } = await import("./js/notifications.js");
+      return getNotifications().length;
+    });
+    await page.keyboard.press("Escape");
+    assert.equal(
+      await page.evaluate(async () => {
+        const { getNotifications } = await import("./js/notifications.js");
+        return getNotifications().length;
+      }),
+      notificationsBefore,
+    );
     await app.getByRole("button", { name: "Desfazer", exact: true }).click();
     assert.equal(
       await app.locator('[data-stat="completed"]').textContent(),
@@ -270,6 +317,36 @@ const fs = require("node:fs");
     await touchPage.locator('[data-mode="2"]').tap();
     await touchPage.locator(".spider-card.face-up").first().tap();
     assert((await touchPage.locator(".spider-card.selected").count()) > 0);
+    const touchSource = await touchPage
+      .locator(".spider-card.face-up")
+      .first()
+      .boundingBox();
+    const touchSession = await mobile.newCDPSession(touchPage);
+    const x = Math.round(touchSource.x + 10),
+      y = Math.round(touchSource.y + 12);
+    await touchSession.send("Input.dispatchTouchEvent", {
+      type: "touchStart",
+      touchPoints: [{ x, y }],
+    });
+    await touchSession.send("Input.dispatchTouchEvent", {
+      type: "touchMove",
+      touchPoints: [{ x: x + 30, y: y + 20 }],
+    });
+    assert.equal(
+      await touchPage.locator(".spider-drag-ghost .spider-card").count(),
+      1,
+    );
+    await touchSession.send("Input.dispatchTouchEvent", {
+      type: "touchEnd",
+      touchPoints: [],
+    });
+    await touchPage.waitForFunction(
+      () => !document.querySelector(".spider-drag-ghost"),
+    );
+    assert.equal(
+      await touchPage.locator('[data-stat="moves"]').textContent(),
+      "0",
+    );
     await mobile.close();
     console.log(
       "PASS Spider: regras integradas, distribuir/desfazer, seleção, movimento inválido, arraste, teclado, dica, confirmação, persistência da sessão, vitória, imagens, três dificuldades, início, confirmação de troca, mobile e toque.",

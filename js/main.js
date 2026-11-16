@@ -24,6 +24,7 @@ function shutdown() {
   clearInterval(bootTimer);
   manager.closeAll();
   taskbar.closePanels();
+  taskbar.reset();
   clearSelection();
   system.hidden = true;
   boot.hidden = true;
@@ -53,6 +54,7 @@ start.addEventListener("click", () => {
     clearInterval(bootTimer);
     boot.hidden = true;
     system.hidden = false;
+    taskbar.reset();
     manager.fitAll();
     document.querySelector("#menu-toggle").focus();
   }, 180);
