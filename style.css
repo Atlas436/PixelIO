@@ -16,9 +16,10 @@
 * {
   box-sizing: border-box;
 }
-body {
+html, body {
   margin: 0;
   overflow: hidden;
+  cursor: url('./assets/ponteiro.png'), auto;
 }
 button,
 input {
@@ -26,7 +27,7 @@ input {
 }
 button {
   color: inherit;
-  cursor: pointer;
+  cursor: url('./assets/ponteiro.png'), pointer;
   border: 1px solid transparent;
   background: var(--base);
 }
@@ -44,7 +45,7 @@ input:focus-visible {
   outline-offset: 3px;
 }
 button:disabled {
-  cursor: default;
+  cursor: url('./assets/ponteiro.png'), default;
 }
 img {
   image-rendering: pixelated;
@@ -428,7 +429,7 @@ output {
   padding: 4px 6px 4px 14px;
   user-select: none;
   touch-action: none;
-  cursor: move;
+  cursor: url('./assets/ponteiro.png'), move;
   gap: 12px;
 }
 .window-title {
