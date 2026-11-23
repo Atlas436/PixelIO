@@ -58,7 +58,7 @@ export async function noteHtml(note) {
           reject(new Error("Não foi possível exportar a imagem."));
         reader.readAsDataURL(image.blob);
       });
-      return `<figure><img src="${data}" alt="${escapeHtml(image.name)}"><figcaption>${escapeHtml(image.name)}</figcaption></figure>`;
+      return `<figure><img src="${data}" alt="${escapeHtml(image.caption || image.name)}"><figcaption>${escapeHtml(image.caption || image.name)}</figcaption></figure>`;
     }),
   );
   return new Blob(

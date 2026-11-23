@@ -28,5 +28,6 @@
 - Pastas e subpastas com navegação, movimentação de itens e exclusão somente quando vazias.
 - Galeria com importação do PC, busca, prévia, download original e exclusão compartilhada com Arquivos.
 - Notas com imagens do PC/Galeria, anexos independentes e exportação HTML com imagens embutidas.
+- Legendas e reordenação nas notas, ações fixas na Galeria e movimentação de vários itens em Arquivos.
 - Textos podem ser abertos como novas notas; as cópias originais são independentes.
 - Persistência local em IndexedDB, sem servidor.

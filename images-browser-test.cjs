@@ -93,6 +93,32 @@ const fs = require("node:fs/promises");
       .setInputFiles({ ...image, name: "Segunda.png" });
     await savedImages(2);
     assert.equal(await notes.locator(".note-images figure").count(), 2);
+    const firstId = await notes
+      .locator(".note-images figure")
+      .first()
+      .getAttribute("data-attachment-id");
+    await notes
+      .locator(".note-image-caption")
+      .first()
+      .fill("Minha legenda <script>");
+    await notes
+      .getByRole("button", { name: "Descer imagem", exact: true })
+      .first()
+      .click();
+    assert.equal(
+      await notes
+        .locator(".note-images figure")
+        .last()
+        .getAttribute("data-attachment-id"),
+      firstId,
+    );
+    assert.equal(
+      await notes.locator(".note-image-caption").last().inputValue(),
+      "Minha legenda <script>",
+    );
+    await notes
+      .getByRole("button", { name: "Salvar agora", exact: true })
+      .click();
     await notes
       .getByRole("button", { name: "Exportar com imagens", exact: true })
       .click();
@@ -112,6 +138,7 @@ const fs = require("node:fs/promises");
     assert.ok(html.includes("&lt;script&gt;"));
     assert.ok(html.includes("&lt;img src=x onerror=alert(1)&gt;"));
     assert.ok(!html.includes("<script>"));
+    assert.ok(html.includes("Minha legenda &lt;script&gt;"));
     await notes
       .getByRole("button", { name: "Exportar .txt", exact: true })
       .click();
@@ -137,6 +164,13 @@ const fs = require("node:fs/promises");
     await open("notes");
     await notes.locator("[data-note-id]").click();
     assert.equal(await notes.locator(".note-images figure").count(), 2);
+    assert.equal(
+      await notes
+        .locator(".note-images figure")
+        .last()
+        .getAttribute("data-attachment-id"),
+      firstId,
+    );
     await page.waitForFunction(() =>
       [...document.querySelectorAll(".note-images img")].every(
         (i) => i.complete && i.naturalWidth > 0,
@@ -164,6 +198,10 @@ const fs = require("node:fs/promises");
       .getByRole("button", { name: "Excluir", exact: true })
       .click();
     await savedImages(1);
+    assert.equal(
+      await notes.locator(".note-image-caption").first().inputValue(),
+      "Minha legenda <script>",
+    );
     await page.setViewportSize({ width: 360, height: 740 });
     await page.waitForTimeout(200);
     assert.equal(
@@ -182,6 +220,16 @@ const fs = require("node:fs/promises");
       [...document.querySelectorAll(".gallery-app img")].every(
         (i) => i.complete && i.naturalWidth > 0,
       ),
+    );
+    assert.equal(
+      await gallery
+        .getByRole("button", { name: "Excluir imagem", exact: true })
+        .evaluate((button) => {
+          const b = button.getBoundingClientRect(),
+            p = button.closest(".gallery-preview").getBoundingClientRect();
+          return b.top >= p.top && b.bottom <= p.bottom;
+        }),
+      true,
     );
     await page.screenshot({ path: "/workspace/work/gallery-mobile.png" });
     await page.setViewportSize({ width: 1366, height: 900 });

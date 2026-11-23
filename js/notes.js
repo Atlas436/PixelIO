@@ -202,6 +202,24 @@ export function createNotes() {
     renderList();
     flush(id).catch(() => {});
   }
+  function updateImages(id, transform, redraw = true) {
+    const previous = records.get(id);
+    if (!previous || disposed) return;
+    const note = {
+      ...previous,
+      images: transform(previous.images || []),
+      updatedAt: Date.now(),
+    };
+    records.set(id, note);
+    drafts.set(id, { note, revision: ++revision });
+    if (activeId === id && redraw) renderImages();
+    renderList();
+    if (redraw) flush(id).catch(() => {});
+    else {
+      clearTimeout(timer);
+      timer = setTimeout(() => flush(id).catch(() => {}), 250);
+    }
+  }
   function renderImages() {
     attachmentUrls.clear();
     const host = root.querySelector(".note-images");
@@ -213,9 +231,59 @@ export function createNotes() {
       figure.dataset.attachmentId = image.id;
       const img = document.createElement("img");
       img.src = attachmentUrls.create(image.blob);
-      img.alt = image.name;
+      img.alt = image.caption || image.name;
       const caption = document.createElement("figcaption");
       caption.textContent = image.name;
+      const label = document.createElement("label");
+      label.textContent = "Legenda";
+      const captionInput = document.createElement("input");
+      captionInput.className = "note-image-caption";
+      captionInput.maxLength = 300;
+      captionInput.value = image.caption || "";
+      captionInput.placeholder = "Adicione uma legenda…";
+      label.append(captionInput);
+      captionInput.addEventListener("input", () => {
+        img.alt = captionInput.value || image.name;
+        updateImages(
+          note.id,
+          (images) =>
+            images.map((item) =>
+              item.id === image.id
+                ? { ...item, caption: captionInput.value }
+                : item,
+            ),
+          false,
+        );
+      });
+      const order = document.createElement("div");
+      for (const [step, text] of [
+        [-1, "Subir imagem"],
+        [1, "Descer imagem"],
+      ]) {
+        const button = iconButton("seta", text, () => {
+          updateImages(note.id, (images) => {
+            const result = [...images],
+              from = result.findIndex((item) => item.id === image.id),
+              to = from + step;
+            if (from < 0 || to < 0 || to >= result.length) return result;
+            [result[from], result[to]] = [result[to], result[from]];
+            return result;
+          });
+          const moved = host.querySelector(
+            `[data-attachment-id="${image.id}"]`,
+          );
+          const next = moved?.querySelector(`[aria-label="${text}"]`);
+          (next && !next.disabled
+            ? next
+            : moved?.querySelector("input")
+          )?.focus();
+        });
+        button.append(document.createTextNode(text));
+        const index = note.images.findIndex((item) => item.id === image.id);
+        button.disabled =
+          index + step < 0 || index + step >= note.images.length;
+        order.append(button);
+      }
       const download = iconButton("download", "Baixar imagem", () =>
         downloadDocument(image),
       );
@@ -247,7 +315,7 @@ export function createNotes() {
         },
       );
       remove.append(document.createTextNode("Remover imagem"));
-      figure.append(img, caption, download, remove);
+      figure.append(img, caption, label, order, download, remove);
       host.append(figure);
     }
   }

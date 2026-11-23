@@ -9,7 +9,7 @@
     "test:spider": "node --test spider-test.mjs",
     "test:music": "node --test music-links-test.mjs && node music-browser-test.cjs && node media-browser-test.cjs",
     "test:documents": "node --test documents-store-test.mjs && node documents-browser-test.cjs",
-    "test:folders": "node --test folders-test.mjs && node folders-browser-test.cjs",
+    "test:folders": "node --test folders-test.mjs && node folders-browser-test.cjs && node bulk-files-browser-test.cjs",
     "test:images": "node images-browser-test.cjs"
   },
   "devDependencies": {

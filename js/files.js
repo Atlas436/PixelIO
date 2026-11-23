@@ -3,6 +3,7 @@ import {
   listFiles,
   createFolder,
   moveFile,
+  moveFiles,
   addFile,
   renameFile,
   removeFile,
@@ -25,6 +26,7 @@ export function createFiles() {
     <div class="document-toolbar"><label class="document-import"><span>Importar arquivos</span><input type="file" id="files-import" multiple></label><label class="document-search">Buscar arquivos<input type="search" id="files-search" placeholder="Nesta pasta"></label></div>
     <form id="new-folder-form" class="new-folder-form" hidden><label for="new-folder-name">Nome da nova pasta</label><input id="new-folder-name" maxlength="160" required autocomplete="off"><button type="submit">Criar pasta</button><button type="button" data-folder-cancel>Cancelar</button></form>
     <nav class="files-path" aria-label="Caminho da pasta"></nav>
+    <div class="files-bulk" aria-label="Seleção de arquivos"></div>
     <div class="files-layout"><div class="files-list" aria-label="Arquivos salvos"></div><section class="file-details" aria-label="Detalhes do arquivo"><p class="document-empty">Selecione um arquivo ou pasta para abrir.</p></section></div>
     <p class="document-status" role="status" aria-live="polite">Abrindo seus arquivos…</p></div>`;
   const shell = root.querySelector(".document-shell"),
@@ -41,6 +43,8 @@ export function createFiles() {
     refreshVersion = 0,
     previewVersion = 0,
     imageURL = null;
+  const checked = new Set();
+  let moving = false;
   const message = (text) => {
     if (!disposed) status.textContent = text;
   };
@@ -127,6 +131,7 @@ export function createFiles() {
       message("A pasta não está mais disponível.");
       return;
     }
+    checked.clear();
     currentFolderId = id;
     selectedId = null;
     search.value = "";
@@ -140,8 +145,96 @@ export function createFiles() {
         : "Duplo clique para abrir uma subpasta, ou selecione e use Abrir pasta.",
     );
   }
+  function renderBulk() {
+    root.classList.toggle("has-bulk-selection", checked.size > 0);
+    const bar = root.querySelector(".files-bulk");
+    bar.replaceChildren();
+    const count = document.createElement("span");
+    count.textContent = `${checked.size} selecionado(s)`;
+    const all = document.createElement("button");
+    all.type = "button";
+    all.textContent = "Selecionar visíveis";
+    all.disabled = moving;
+    all.onclick = () => {
+      for (const file of records.filter(
+        (file) =>
+          parentOf(file) === currentFolderId &&
+          foldText(file.name).includes(foldText(search.value)),
+      ))
+        checked.add(file.id);
+      renderList();
+    };
+    const clear = document.createElement("button");
+    clear.type = "button";
+    clear.textContent = "Limpar seleção";
+    clear.disabled = !checked.size || moving;
+    clear.onclick = () => {
+      checked.clear();
+      renderList();
+    };
+    bar.append(count, all, clear);
+    if (!checked.size) return;
+    const label = document.createElement("label");
+    label.textContent = "Mover selecionados para ";
+    const select = document.createElement("select");
+    select.setAttribute("aria-label", "Destino dos selecionados");
+    select.disabled = moving;
+    const targets = [
+      { id: null, trail: [] },
+      ...records.filter(isFolder).map((folder) => ({
+        id: folder.id,
+        trail: folderTrail(records, folder.id),
+      })),
+    ];
+    for (const target of targets) {
+      if (
+        !target.trail ||
+        target.id === currentFolderId ||
+        target.trail.some((folder) => checked.has(folder.id))
+      )
+        continue;
+      const option = document.createElement("option");
+      option.value = target.id || "";
+      option.textContent = [
+        "Arquivos",
+        ...target.trail.map((folder) => folder.name),
+      ].join(" / ");
+      select.append(option);
+    }
+    label.append(select);
+    const move = iconButton("seta", "Mover selecionados", async () => {
+      const ids = [...checked],
+        destination = select.value || null;
+      moving = true;
+      renderList();
+      try {
+        await moveFiles(ids, destination);
+        checked.clear();
+        selectedId = null;
+        clearDetails();
+        await refresh();
+        message(`${ids.length} item(ns) movido(s).`);
+      } catch (error) {
+        report(error);
+      } finally {
+        moving = false;
+        if (!disposed) renderList();
+      }
+    });
+    move.append(document.createTextNode("Mover selecionados"));
+    move.disabled = moving || !select.options.length;
+    bar.append(label, move);
+  }
   function renderList() {
     if (disposed) return;
+    for (const id of checked)
+      if (
+        !records.some(
+          (file) => file.id === id && parentOf(file) === currentFolderId,
+        )
+      )
+        checked.delete(id);
+    renderBulk();
     list.replaceChildren();
     const query = foldText(search.value);
     const files = records
@@ -190,7 +283,20 @@ export function createFiles() {
       });
       if (isFolder(file))
         button.addEventListener("dblclick", () => openFolder(file.id));
-      list.append(button);
+      const row = document.createElement("div");
+      row.className = "files-entry";
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.checked = checked.has(file.id);
+      checkbox.disabled = moving;
+      checkbox.setAttribute("aria-label", `Selecionar ${file.name}`);
+      checkbox.onchange = () => {
+        if (checkbox.checked) checked.add(file.id);
+        else checked.delete(file.id);
+        renderBulk();
+      };
+      row.append(checkbox, button);
+      list.append(row);
     }
     if (!files.length) {
       const empty = document.createElement("p");

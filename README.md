@@ -68,6 +68,7 @@ Os dois aplicativos usam IndexedDB, um armazenamento local do navegador. Não h�
 - A busca considera título e conteúdo, sem diferenciar maiúsculas e acentos.
 - **Exportar .txt** cria uma cópia UTF-8 em **Arquivos**. O arquivo exportado é uma fotografia do conteúdo daquele momento; novas exportações criam outras cópias e não sobrescrevem as anteriores. Podem existir cópias com o mesmo nome, identificadas separadamente.
 - **Imagem do PC** anexa uma ou mais imagens ao fim da nota; **Imagem da Galeria** permite escolher uma imagem já importada. Cada anexo é uma cópia independente, salva junto da nota. Remover um anexo pede confirmação e não apaga o original da Galeria.
+- Cada imagem tem uma **Legenda** com salvamento automático e botões **Subir imagem** / **Descer imagem**. A ordem e as legendas permanecem após reabrir a nota e são incluídas na exportação HTML.
 - **Exportar com imagens** cria em Arquivos um HTML independente com texto e imagens embutidas, que pode ser baixado e aberto no navegador sem conexão. O texto é escapado e não executa HTML fornecido na nota. A exportação `.txt` contém somente o texto. Também é possível baixar cada imagem da nota separadamente.
 - **Abrir Arquivos** leva ao outro aplicativo para consultar ou baixar as exportações.
 - **Excluir nota** pede confirmação e mantém os arquivos já exportados.
@@ -79,6 +80,7 @@ Fechar a janela ou trocar de nota força a gravação pendente. Se o navegador n
 - Mostra as notas exportadas e os arquivos escolhidos em **Importar arquivos**. Não acessa automaticamente pastas ou downloads do computador.
 - **Nova pasta** cria pastas e subpastas. Abra com duplo clique ou **Abrir pasta**; use **Voltar** ou o caminho acima da lista para navegar.
 - **Mover** leva o item selecionado para outra pasta, preservando seu conteúdo. Não permite mover uma pasta para dentro dela mesma ou de suas subpastas.
+- Marque as caixinhas para selecionar vários arquivos/pastas e use **Mover selecionados**. **Selecionar visíveis** respeita a busca; **Limpar seleção** desmarca tudo. A seleção permanece ao filtrar e é limpa ao navegar para outra pasta. Um conflito cancela todo o lote sem mover itens parcialmente; os destinos que ficam dentro de uma pasta selecionada não são oferecidos.
 - Importações entram na pasta aberta; exportações do Notas entram na raiz. A busca mostra itens da pasta atual. Os arquivos anteriores continuam na raiz.
 - Pastas podem ser renomeadas e só podem ser excluídas quando estiverem vazias. A organização permanece salva no mesmo navegador.
 - Busca pelo nome; permite renomear, excluir com confirmação e **Baixar no computador**.
@@ -94,6 +96,7 @@ A lista acompanha importações/exportações enquanto os aplicativos estão abe
 - **Importar imagens do PC** adiciona imagens PNG, JPEG, GIF, WebP, BMP ou AVIF, até 20 MB por imagem. A importação valida se o navegador consegue decodificá-las; SVG não é aceito.
 - Mostra as imagens de todas as pastas de Arquivos em uma grade com busca por nome. As importações da Galeria ficam na raiz de Arquivos; mover ou renomear por lá atualiza a Galeria.
 - Selecione uma miniatura para ampliar e **Baixar imagem no PC**. O download preserva os bytes do arquivo original.
+- Os botões de baixar e excluir ficam fixos no painel de prévia, inclusive no celular. Somente o conteúdo da imagem rola.
 - **Excluir imagem** pede confirmação e remove o item compartilhado com Arquivos. Cópias inseridas em notas e arquivos já baixados continuam intactos.
 - As imagens ficam no mesmo navegador/perfil, sem envio à rede. Limpar os dados do site também apaga a Galeria e as imagens das notas; mantenha cópias no computador.
 
@@ -184,3 +187,5 @@ Os testes `music-links-test.mjs` e `music-browser-test.cjs` cobrem URLs aceitas/
 `npm run test:folders` verifica criação, navegação, subpastas, movimentação, preservação de arquivos antigos, persistência, exclusão de pastas vazias e recusa de destinos inválidos, incluindo tela pequena no Chromium.
 
 `npm run test:images` verifica importação e validação da Galeria, download com bytes originais, anexos em notas, persistência, cópias independentes, remoção confirmada, exportação HTML com imagens embutidas e texto escapado, compatibilidade com TXT e tela pequena.
+
+Esses testes também verificam legendas, reordenação persistente e ações visíveis da Galeria. `test:folders` inclui `bulk-files-browser-test.cjs`, com seleção múltipla, busca, preservação dos bytes e cancelamento atômico em conflitos de nome ou ciclos.
