@@ -508,7 +508,7 @@ noscript {
 }
 @media (max-height: 620px) {
   #desktop {
-    grid-template-rows: repeat(3, 90px);
+    grid-template-rows: repeat(3, 100px);
     grid-auto-columns: 90px;
     padding: 12px;
   }
@@ -536,7 +536,7 @@ noscript {
     padding: 6px;
   }
   #desktop {
-    grid-template-rows: repeat(5, 88px);
+    grid-template-rows: repeat(5, 100px);
     grid-auto-columns: 86px;
     padding: 12px 6px;
   }
@@ -586,8 +586,8 @@ noscript {
 }
 
 .app-icon {
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
   object-fit: contain;
   image-rendering: pixelated;
   flex-shrink: 0;
@@ -699,8 +699,8 @@ noscript {
   color: var(--normal);
 }
 .desktop-app .settings-icon {
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
 }
 .menu-app .settings-icon {
   width: 26px;
