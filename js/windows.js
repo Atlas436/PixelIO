@@ -43,6 +43,13 @@ export class WindowManager {
     const content = appContent(app);
     element.append(titlebar, content);
     const offset = (this.windows.size % 6) * 28;
+    const preferred = {
+      solitaire: { width: 1040, height: 650 },
+      music: { width: 800, height: 620 },
+      settings: { width: 560, height: 480 },
+      notes: { width: 900, height: 680 },
+      files: { width: 880, height: 660 },
+    }[app.id] || { width: 560, height: 360 };
     const state = {
       app,
       element,
@@ -51,15 +58,8 @@ export class WindowManager {
       maximized: false,
       x: app.id === "solitaire" ? 40 : 160 + offset,
       y: app.id === "solitaire" ? 12 : 40 + offset,
-      width: app.id === "solitaire" ? 1040 : app.id === "music" ? 800 : 560,
-      height:
-        app.id === "solitaire"
-          ? 650
-          : app.id === "music"
-            ? 620
-            : app.id === "settings"
-              ? 480
-              : 360,
+      width: preferred.width,
+      height: preferred.height,
       order: 0,
       dispose: () => content.dispose?.(),
     };

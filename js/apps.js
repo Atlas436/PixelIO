@@ -1,3 +1,5 @@
+import { createNotes } from "./notes.js";
+import { createFiles } from "./files.js";
 import { createMusic } from "./music.js";
 import { createSpider } from "./spider.js";
 import { createSettings } from "./settings.js";
@@ -87,6 +89,8 @@ export function placeholder(app) {
 }
 
 export function appContent(app) {
+  if (app.id === "notes") return createNotes();
+  if (app.id === "files") return createFiles();
   if (app.id === "music") return createMusic();
   if (app.id === "solitaire") return createSpider();
   if (app.id === "settings") return createSettings();

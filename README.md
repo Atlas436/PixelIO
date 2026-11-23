@@ -1,6 +1,6 @@
 # Pixel.OI
 
-Sistema operacional fictício em pixel art, executado inteiramente no navegador. Primeira etapa: apresentação, boot simulado, desktop, menu com dez aplicativos e gerenciador reutilizável de janelas. Agora inclui Paciência Spider com três dificuldades e o aplicativo Música. Não há servidor de aplicação, autenticação, Supabase ou IA nesta etapa.
+Sistema operacional fictício em pixel art, executado inteiramente no navegador. Primeira etapa: apresentação, boot simulado, desktop, menu com dez aplicativos e gerenciador reutilizável de janelas. Agora inclui Paciência Spider com três dificuldades e os aplicativos Música, Notas e Arquivos. Não há servidor de aplicação, autenticação, Supabase ou IA nesta etapa.
 
 ## Executar localmente
 
@@ -15,6 +15,9 @@ Na pasta do projeto, execute `python3 -m http.server 8080` e abra http://localho
 - `js/taskbar.js`: aplicativos abertos, menu, relógio e painéis.
 - `js/windows.js`: abertura, foco, sobreposição, arraste e controles das janelas.
 - `js/apps.js`: catálogo, ícones e abertura dos aplicativos implementados.
+- `js/notes.js` e `js/files.js`: aplicativos Notas e Arquivos.
+- `js/documents-store.js`: dados locais compartilhados em IndexedDB.
+- `js/document-dialog.js` e `documents.css`: confirmações e visual desses dois aplicativos.
 - `js/music.js` e `music.css`: interface e player do Música.
 - `js/music-links.js`: validação dos links e geração de URLs dos players oficiais.
 - `js/audio-settings.js`: volume compartilhado entre barra e arquivos locais.
@@ -50,7 +53,33 @@ Clique em Iniciar Pixel.OI e aguarde a simulação visual do boot. No desktop, u
 
 Arraste uma janela pela barra de título. Use os PNGs para minimizar, maximizar/restaurar e fechar; duplo clique no título também maximiza/restaura. A barra de tarefas restaura janelas minimizadas e alterna o foco; clicar no aplicativo ativo o minimiza. Janelas são mantidas na área visível, inclusive ao redimensionar a tela.
 
-Os painéis fecham com Escape ou clique fora. Energia → Encerrar Pixel.OI retorna à apresentação e fecha as janelas. O relógio segue o horário local do navegador. O volume controla os arquivos locais do Música; não altera o volume do computador nem dos players externos. Paciência abre a Spider, Música abre os players e arquivos locais, e Configurações contém as preferências da barra; os demais aplicativos exibem conteúdo temporário.
+Os painéis fecham com Escape ou clique fora. Energia → Encerrar Pixel.OI retorna à apresentação e fecha as janelas. O relógio segue o horário local do navegador. O volume controla os arquivos locais do Música; não altera o volume do computador nem dos players externos. Paciência abre a Spider; Música oferece players e arquivos locais; Notas e Arquivos compartilham documentos locais; Configurações contém as preferências da barra. Os demais aplicativos exibem conteúdo temporário.
+
+## Notas e Arquivos
+
+Os dois aplicativos usam IndexedDB, um armazenamento local do navegador. Não há servidor, conta ou envio de arquivos. Os dados permanecem após fechar as janelas, encerrar o Pixel.OI e recarregar o site no mesmo navegador/perfil. Limpar os dados do site ou trocar de navegador não leva esses documentos junto; baixe cópias do que quiser guardar fora do Pixel.OI.
+
+### Notas
+
+- **Nova nota** cria um documento. Edite título e conteúdo; as alterações são salvas automaticamente após uma curta pausa na digitação.
+- **Salvar agora** grava imediatamente. A mensagem de salvamento só confirma depois da conclusão da gravação.
+- A busca considera título e conteúdo, sem diferenciar maiúsculas e acentos.
+- **Exportar .txt** cria uma cópia UTF-8 em **Arquivos**. O arquivo exportado é uma fotografia do conteúdo daquele momento; novas exportações criam outras cópias e não sobrescrevem as anteriores. Podem existir cópias com o mesmo nome, identificadas separadamente.
+- **Abrir Arquivos** leva ao outro aplicativo para consultar ou baixar as exportações.
+- **Excluir nota** pede confirmação e mantém os arquivos já exportados.
+
+Fechar a janela ou trocar de nota força a gravação pendente. Se o navegador negar a gravação, o app mostra o erro e mantém o rascunho na sessão para recuperar ao reabrir a janela. Um aviso de saída protege rascunhos ainda não gravados; não trate a mensagem de erro como salvamento concluído.
+
+### Arquivos
+
+- Mostra as notas exportadas e os arquivos escolhidos em **Importar arquivos**. Não acessa automaticamente pastas ou downloads do computador.
+- Busca pelo nome; permite renomear, excluir com confirmação e **Baixar no computador**.
+- Textos de até 1 MB são exibidos como texto puro. HTML e JavaScript importados não são executados. Imagens PNG, JPEG, GIF, WebP, BMP e AVIF podem ser visualizadas.
+- Outros formatos e textos maiores podem ser baixados para abrir em outro aplicativo.
+- **Abrir cópia no Notas** transforma um texto em uma nova nota editável. O arquivo original continua intacto; para levar alterações de volta a Arquivos, exporte novamente.
+- Excluir um arquivo remove somente a cópia do Pixel.OI; não exclui a nota original nem arquivos no computador.
+
+A lista acompanha importações/exportações enquanto os aplicativos estão abertos. As imagens de prévia e os downloads usam URLs temporárias liberadas após o uso.
 
 ## Música
 
@@ -133,3 +162,5 @@ O teste `smoke-test.cjs` cobre apresentação e boot, seleção, abertura dos de
 `npm run test:spider` executa os 20 testes de regras sem dependências externas. `npm test` executa também o teste do desktop e `spider-browser-test.cjs`, com distribuição/desfazer, movimentação por clique, arraste e teclado, dicas, confirmação, preservação da sessão, vitória, imagens, toque, escolha das três dificuldades e cancelamento da troca de modo. Os testes usam um servidor estático aberto em http://localhost:8080. O baralho permanece com 104 cartas após jogadas, distribuições e desfazer, verificado em partidas com embaralhamentos determinísticos. Não há etapa de build porque o navegador recebe HTML, CSS e JavaScript diretamente. Publicação remota depende de ativar GitHub Pages nas configurações do repositório.
 
 Os testes `music-links-test.mjs` e `music-browser-test.cjs` cobrem URLs aceitas/rejeitadas, ícones, reprodução WAV real, fila, pausa, posição, volume, minimizar, download local, troca de players, fechamento e encerramento, incluindo tela pequena. `npm run test:music` executa somente essas verificações (servidor local aberto).
+
+`npm run test:documents` executa os testes de nomes/busca e a integração real em IndexedDB no Chromium: autosave, busca, exportação Notas→Arquivos, cópias independentes, renomear, download UTF-8, abertura no Notas, confirmações, fechamento com edição pendente, importação segura, imagens, persistência após recarregar, tela pequena e erro de armazenamento. O servidor local deve estar aberto.
