@@ -1,8 +1,9 @@
+import { createMusic } from "./music.js";
 import { createSpider } from "./spider.js";
 import { createSettings } from "./settings.js";
 import { pixelArt } from "./assets.js";
 
-// Catálogo: Paciência usa o verso das cartas; os outros ícones virão depois.
+// Ícones originais do Drive; Studio usa a arte criada para o projeto.
 export const apps = [
   { id: "files", name: "Arquivos", initials: "AR" },
   { id: "music", name: "Música", initials: "MU" },
@@ -16,7 +17,52 @@ export const apps = [
   { id: "about", name: "Sobre", initials: "SO" },
 ];
 
+const iconFiles = {
+  files: "arquivo.png",
+  music: "música.png",
+  terminal: "terminal.png",
+  notes: "notas.png",
+  assistant: "ia.png",
+  gallery: "galeria.png",
+  about: "sobre.png",
+  studio: "pixel-studio.png",
+};
+const iconRects = {
+  "sobre.png": [28, 21, 54, 46, 100, 100],
+  "arquivo.png": [22, 39, 49, 31, 100, 100],
+  "música.png": [16, 33, 45, 50, 100, 100],
+  "galeria.png": [13, 32, 68, 51, 100, 100],
+  "notas.png": [21, 22, 47, 47, 100, 100],
+  "pixel-studio.png": [290, 276, 699, 719, 1254, 1254],
+  "terminal.png": [21, 38, 49, 34, 100, 100],
+  "ia.png": [10, 12, 76, 62, 100, 100],
+};
+
 export function placeholder(app) {
+  const filename = iconFiles[app.id];
+  if (filename) {
+    const [x, y, w, h, sourceW, sourceH] = iconRects[filename];
+    const icon = document.createElement("span");
+    icon.className = "app-icon";
+    icon.setAttribute("aria-hidden", "true");
+    const crop = document.createElement("span");
+    crop.className = "app-icon-crop";
+    crop.style.width = `${(w / Math.max(w, h)) * 100}%`;
+    crop.style.height = `${(h / Math.max(w, h)) * 100}%`;
+    const image = document.createElement("img");
+    image.alt = "";
+    image.draggable = false;
+    image.src = new URL(`../assets/icones/${filename}`, import.meta.url).href;
+    Object.assign(image.style, {
+      width: `${(sourceW / w) * 100}%`,
+      height: `${(sourceH / h) * 100}%`,
+      left: `${(-x / w) * 100}%`,
+      top: `${(-y / h) * 100}%`,
+    });
+    crop.append(image);
+    icon.append(crop);
+    return icon;
+  }
   if (app.id === "settings") {
     const icon = pixelArt("configuracoes");
     icon.classList.add("settings-icon");
@@ -41,6 +87,7 @@ export function placeholder(app) {
 }
 
 export function appContent(app) {
+  if (app.id === "music") return createMusic();
   if (app.id === "solitaire") return createSpider();
   if (app.id === "settings") return createSettings();
   const content = document.createElement("div");

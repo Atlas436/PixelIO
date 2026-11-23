@@ -40,7 +40,8 @@ export class WindowManager {
       iconButton("fechar", `Fechar ${app.name}`, () => this.close(app.id)),
     );
     titlebar.append(title, controls);
-    element.append(titlebar, appContent(app));
+    const content = appContent(app);
+    element.append(titlebar, content);
     const offset = (this.windows.size % 6) * 28;
     const state = {
       app,
@@ -50,9 +51,17 @@ export class WindowManager {
       maximized: false,
       x: app.id === "solitaire" ? 40 : 160 + offset,
       y: app.id === "solitaire" ? 12 : 40 + offset,
-      width: app.id === "solitaire" ? 1040 : 560,
-      height: app.id === "solitaire" ? 650 : app.id === "settings" ? 480 : 360,
+      width: app.id === "solitaire" ? 1040 : app.id === "music" ? 800 : 560,
+      height:
+        app.id === "solitaire"
+          ? 650
+          : app.id === "music"
+            ? 620
+            : app.id === "settings"
+              ? 480
+              : 360,
       order: 0,
+      dispose: () => content.dispose?.(),
     };
     this.windows.set(app.id, state);
     this.layer.append(element);
@@ -144,6 +153,7 @@ export class WindowManager {
   close(id) {
     const state = this.windows.get(id);
     if (!state) return;
+    state.dispose();
     state.element.remove();
     this.windows.delete(id);
     if (this.activeId === id) this.focusNext();
@@ -151,7 +161,10 @@ export class WindowManager {
   }
 
   closeAll() {
-    for (const state of this.windows.values()) state.element.remove();
+    for (const state of this.windows.values()) {
+      state.dispose();
+      state.element.remove();
+    }
     this.windows.clear();
     this.activeId = null;
     this.order = 0;

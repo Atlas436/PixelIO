@@ -1,6 +1,6 @@
 # Pixel.OI
 
-Sistema operacional fictício em pixel art, executado inteiramente no navegador. Primeira etapa: apresentação, boot simulado, desktop, menu com dez aplicativos e gerenciador reutilizável de janelas. Agora inclui Paciência Spider com três dificuldades. Não há servidor de aplicação, autenticação, Supabase ou IA nesta etapa.
+Sistema operacional fictício em pixel art, executado inteiramente no navegador. Primeira etapa: apresentação, boot simulado, desktop, menu com dez aplicativos e gerenciador reutilizável de janelas. Agora inclui Paciência Spider com três dificuldades e o aplicativo Música. Não há servidor de aplicação, autenticação, Supabase ou IA nesta etapa.
 
 ## Executar localmente
 
@@ -14,7 +14,11 @@ Na pasta do projeto, execute `python3 -m http.server 8080` e abra http://localho
 - `js/desktop.js`: seleção e abertura dos atalhos.
 - `js/taskbar.js`: aplicativos abertos, menu, relógio e painéis.
 - `js/windows.js`: abertura, foco, sobreposição, arraste e controles das janelas.
-- `js/apps.js`: catálogo, abertura da Spider, Configurações e conteúdo temporário dos outros aplicativos.
+- `js/apps.js`: catálogo, ícones e abertura dos aplicativos implementados.
+- `js/music.js` e `music.css`: interface e player do Música.
+- `js/music-links.js`: validação dos links e geração de URLs dos players oficiais.
+- `js/audio-settings.js`: volume compartilhado entre barra e arquivos locais.
+- `assets/icones/`: sete PNGs originais da pasta `icones` do Drive e arte do Pixel Studio.
 - `js/settings.js`: preferências e janela de Configurações.
 - `js/taskbar-visibility.js`: ocultação e revelação da barra.
 - `js/notifications.js`: avisos internos dos aplicativos.
@@ -34,7 +38,7 @@ Os PNGs foram copiados das pastas BotõesBase, BotõesAdicionais e Tela de Fundo
 
 Os controles usam as imagens normal, hover e pressed existentes. Ícones auxiliares brancos usam máscaras CSS com o PNG original para receber a cor oficial. Ampliamos os botões pixel art com `image-rendering: pixelated`.
 
-Paciência usa o verso das cartas como ícone no desktop e no menu de aplicativos. Configurações usa a engrenagem autoral. Os outros oito aplicativos usam suas iniciais como espaços reservados até receberem os ícones definitivos. O botão de restaurar reutiliza o PNG de maximizar, com rótulo acessível atualizado. As cartas de espadas da pasta Baralho foram importadas com autorização para a Spider. O verso `verso-pixel-oi.png` foi criado para este jogo. Os PNGs originais foram preservados; um recorte por CSS remove somente as margens transparentes na exibição. Falta o 9 de espadas no material fornecido: por enquanto ele é representado por uma carta tipográfica provisória “9 ♠”. Copas, ouros e paus também foram importados para os modos médio e difícil. Os nomes e bytes dos recursos originais foram mantidos.
+Paciência usa o verso das cartas como ícone no desktop e no menu de aplicativos. Configurações usa a engrenagem autoral. Arquivos, Música, Terminal, Notas, Assistente IA, Galeria e Sobre usam os sete PNGs originais fornecidos na pasta `icones` do Drive. Pixel Studio usa a arte criada para o projeto; somente o ícone está integrado, e o aplicativo será implementado por último. Os recortes visuais respeitam a proporção e retiram as margens transparentes por CSS, sem alterar os arquivos originais. O botão de restaurar reutiliza o PNG de maximizar, com rótulo acessível atualizado. As cartas de espadas da pasta Baralho foram importadas com autorização para a Spider. O verso `verso-pixel-oi.png` foi criado para este jogo. Os PNGs originais foram preservados; um recorte por CSS remove somente as margens transparentes na exibição. Falta o 9 de espadas no material fornecido: por enquanto ele é representado por uma carta tipográfica provisória “9 ♠”. Copas, ouros e paus também foram importados para os modos médio e difícil. Os nomes e bytes dos recursos originais foram mantidos.
 
 Paleta: fundo `#1F1833`, normal `#94D2D4`, hover `#63C2C9`, pressed `#4C93AD`. Relógio, idioma e notificações usam a cor normal. `POR` indica o idioma da interface, sem seletor de tradução nesta etapa.
 
@@ -44,7 +48,21 @@ Clique em Iniciar Pixel.OI e aguarde a simulação visual do boot. No desktop, u
 
 Arraste uma janela pela barra de título. Use os PNGs para minimizar, maximizar/restaurar e fechar; duplo clique no título também maximiza/restaura. A barra de tarefas restaura janelas minimizadas e alterna o foco; clicar no aplicativo ativo o minimiza. Janelas são mantidas na área visível, inclusive ao redimensionar a tela.
 
-Os painéis fecham com Escape ou clique fora. Energia → Encerrar Pixel.OI retorna à apresentação e fecha as janelas. O relógio segue o horário local do navegador. Volume é um controle reservado aos futuros sons internos; não controla o volume do computador. Paciência abre a Spider e Configurações contém as preferências da barra; os demais aplicativos exibem conteúdo temporário.
+Os painéis fecham com Escape ou clique fora. Energia → Encerrar Pixel.OI retorna à apresentação e fecha as janelas. O relógio segue o horário local do navegador. O volume controla os arquivos locais do Música; não altera o volume do computador nem dos players externos. Paciência abre a Spider, Música abre os players e arquivos locais, e Configurações contém as preferências da barra; os demais aplicativos exibem conteúdo temporário.
+
+## Música
+
+Abra Música no desktop ou no menu. Não exige conta do Pixel.OI, servidor ou chave de API.
+
+- **Meus arquivos:** adicione um ou mais áudios locais (MP3, WAV, OGG e outros formatos suportados pelo navegador). Há fila, reproduzir/pausar, anterior/próxima faixa, posição da música e download de uma cópia do arquivo original. Um formato não suportado mostra uma mensagem de erro. Ao terminar uma faixa, a próxima toca automaticamente; a última encerra a fila.
+- **YouTube:** cole um link HTTPS de vídeo, Shorts, transmissão ou playlist e clique em Abrir player. O vídeo usa o player oficial incorporado; há um link para abrir diretamente no YouTube.
+- **Spotify:** cole um link HTTPS de música, álbum, playlist ou podcast de `open.spotify.com`. O conteúdo usa o player oficial, também com link para abrir no serviço.
+
+Os arquivos locais não são enviados à rede. Ficam apenas na janela atual; ao fechar Música ou encerrar o Pixel.OI, o áudio para e as URLs temporárias são liberadas. Minimizar permite continuar ouvindo. Trocar de aba pausa os arquivos locais e remove o player externo anterior para evitar sons simultâneos. Ao reabrir a janela, adicione novamente os arquivos.
+
+O volume da barra controla os arquivos locais. YouTube e Spotify possuem controles próprios, com disponibilidade, login e eventuais limitações de reprodução determinados pelos serviços. Não há conversão ou download de áudio desses serviços: a opção de baixar serve apenas aos arquivos locais adicionados pelo usuário.
+
+A verificação automatizada reproduz WAV real e testa os controles, volume, fila, download local e liberação dos recursos. Os iframes externos são simulados nos testes para verificar seus links e ciclo de vida; isso não comprova a disponibilidade de cada conteúdo nos serviços reais.
 
 ## Configurações e barra de tarefas
 
@@ -105,3 +123,5 @@ Os caminhos são relativos e funcionam sob `/PixelIO/` sem configuração de bas
 O teste `smoke-test.cjs` cobre apresentação e boot, seleção, abertura dos dez apps, prevenção de duplicatas, foco, arraste, minimizar/restaurar, maximizar/restaurar, fechar, menus, notificações, volume, imagens, tela de 360×640, encerramento e reinício. Playwright é dependência apenas de desenvolvimento.
 
 `npm run test:spider` executa os 20 testes de regras sem dependências externas. `npm test` executa também o teste do desktop e `spider-browser-test.cjs`, com distribuição/desfazer, movimentação por clique, arraste e teclado, dicas, confirmação, preservação da sessão, vitória, imagens, toque, escolha das três dificuldades e cancelamento da troca de modo. Os testes usam um servidor estático aberto em http://localhost:8080. O baralho permanece com 104 cartas após jogadas, distribuições e desfazer, verificado em partidas com embaralhamentos determinísticos. Não há etapa de build porque o navegador recebe HTML, CSS e JavaScript diretamente. Publicação remota depende de ativar GitHub Pages nas configurações do repositório.
+
+Os testes `music-links-test.mjs` e `music-browser-test.cjs` cobrem URLs aceitas/rejeitadas, ícones, reprodução WAV real, fila, pausa, posição, volume, minimizar, download local, troca de players, fechamento e encerramento, incluindo tela pequena. `npm run test:music` executa somente essas verificações (servidor local aberto).

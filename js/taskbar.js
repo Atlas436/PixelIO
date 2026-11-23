@@ -1,3 +1,4 @@
+import { setVolume } from "./audio-settings.js";
 import { apps, placeholder } from "./apps.js";
 import { decorateButton, pixelArt } from "./assets.js";
 import { setupTaskbarVisibility } from "./taskbar-visibility.js";
@@ -72,17 +73,25 @@ export function setupTaskbar(manager, shutdown) {
     shutdown();
   });
   const volume = document.querySelector("#volume-level");
-  const volumeButton = document.querySelector('#volume-toggle');
+  const volumeButton = document.querySelector("#volume-toggle");
   function updateVolume() {
     const value = Number(volume.value);
-    const level = value === 0 ? 'mudo' : value <= 33 ? 'baixo' : value <= 66 ? 'medio' : 'alto';
+    setVolume(value / 100);
+    const level =
+      value === 0
+        ? "mudo"
+        : value <= 33
+          ? "baixo"
+          : value <= 66
+            ? "medio"
+            : "alto";
     if (volumeButton.dataset.level !== level) {
-      volumeButton.querySelector('.pixel-art')?.remove();
+      volumeButton.querySelector(".pixel-art")?.remove();
       volumeButton.prepend(pixelArt(`volume_${level}`));
       volumeButton.dataset.level = level;
     }
-    const label = value === 0 ? 'Volume: mudo' : `Volume: ${value}%`;
-    volumeButton.setAttribute('aria-label', label);
+    const label = value === 0 ? "Volume: mudo" : `Volume: ${value}%`;
+    volumeButton.setAttribute("aria-label", label);
     volumeButton.title = label;
     document.querySelector("#volume-value").textContent = `${volume.value}%`;
   }

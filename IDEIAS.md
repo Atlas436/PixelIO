@@ -1,13 +1,18 @@
 # Ideias para próximas etapas
 
-## Música — ideia registrada, ainda não implementar
+## Música — primeira versão implementada
 
 - Abas YouTube, Spotify e Meus arquivos.
 - Colar links do YouTube e Spotify para reprodução pelos players oficiais.
 - Adicionar arquivos locais de áudio compatíveis com o navegador (MP3, WAV etc.).
 - Permitir baixar arquivos disponibilizados com autorização de distribuição.
 - Links dos players oficiais do YouTube e Spotify não oferecem download do áudio.
-- Considerar requisitos de login, disponibilidade e regras dos players ao implementar.
+- Players oficiais, fila local, download de arquivos locais e controle de volume implementados.
+- Limitações de login/disponibilidade seguem os provedores.
+
+## Ordem de desenvolvimento
+
+- Pixel Studio será implementado por último, por sua complexidade. Seu ícone já pode aparecer no desktop.
 
 ## Barra e notificações
 

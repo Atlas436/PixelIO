@@ -768,3 +768,8 @@ noscript {
     transition: none;
   }
 }
+
+/* Recorte de margens transparentes somente na exibição dos ícones originais. */
+span.app-icon { display: inline-grid; place-items: center; }
+.app-icon-crop { display: block; position: relative; overflow: hidden; }
+.app-icon-crop > img { position: absolute; max-width: none; object-fit: fill; image-rendering: pixelated; }
