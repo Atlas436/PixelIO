@@ -599,7 +599,7 @@ noscript {
 
 /* Ocultação da barra, preferências e notificações internas. */
 #taskbar {
-  transition: transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 800ms cubic-bezier(0.45, 0, 0.55, 1);
 }
 #system.taskbar-autohide #workspace {
   bottom: 0;
