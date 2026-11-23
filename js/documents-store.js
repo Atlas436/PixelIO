@@ -1,4 +1,5 @@
 // Dados locais compartilhados pelos apps Notas e Arquivos. Nenhum arquivo é enviado.
+import { parentOf, isFolder, validateDestination } from "./file-tree.js";
 const listeners = new Set();
 let database;
 export const newDocumentId = () => crypto.randomUUID();
@@ -106,7 +107,53 @@ export function validateFilename(value) {
 }
 export const noteFilename = (note) =>
   `${(note.title.trim() || "Sem título").replace(/[\\/:*?"<>|\u0000-\u001f]/g, "-").slice(0, 150)}.txt`;
-export async function addFile(blob, name, { sourceNoteId = null } = {}) {
+// Validação e gravação ocorrem na mesma transação para evitar pastas órfãs.
+async function changeFiles(action) {
+  const db = await openDatabase();
+  const result = await new Promise((resolve, reject) => {
+    const transaction = db.transaction("files", "readwrite"),
+      store = transaction.objectStore("files");
+    let result, failure;
+    store.getAll().onsuccess = (event) => {
+      try {
+        result = action(event.target.result, store);
+      } catch (error) {
+        failure = error;
+        transaction.abort();
+      }
+    };
+    transaction.oncomplete = () => resolve(result);
+    transaction.onabort = () =>
+      reject(
+        failure ||
+          new Error(
+            transaction.error?.name === "QuotaExceededError"
+              ? "O espaço deste navegador está cheio."
+              : "Não foi possível alterar os arquivos neste navegador.",
+          ),
+      );
+    transaction.onerror = () => {};
+  });
+  emit("files", result?.id);
+  return result;
+}
+function validateFolderName(entries, name, parentId, exceptId = null) {
+  if (
+    entries.some(
+      (entry) =>
+        isFolder(entry) &&
+        entry.id !== exceptId &&
+        parentOf(entry) === parentId &&
+        foldText(entry.name) === foldText(name),
+    )
+  )
+    throw new Error("Já existe uma pasta com esse nome neste local.");
+}
+export async function addFile(
+  blob,
+  name,
+  { sourceNoteId = null, parentId = null } = {},
+) {
   const file = {
     id: newDocumentId(),
     name: validateFilename(name),
@@ -114,40 +161,67 @@ export async function addFile(blob, name, { sourceNoteId = null } = {}) {
     size: blob.size,
     blob,
     sourceNoteId,
+    kind: "file",
+    parentId,
     createdAt: Date.now(),
     updatedAt: Date.now(),
   };
-  await operation("files", "readwrite", (store) => store.add(file));
-  emit("files", file.id);
-  return file;
+  return changeFiles((entries, store) => {
+    validateDestination(entries, parentId);
+    store.add(file);
+    return file;
+  });
+}
+export function createFolder(name, parentId = null) {
+  name = validateFilename(name);
+  return changeFiles((entries, store) => {
+    validateDestination(entries, parentId);
+    validateFolderName(entries, name, parentId);
+    const folder = {
+      id: newDocumentId(),
+      kind: "folder",
+      parentId,
+      name,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    };
+    store.add(folder);
+    return folder;
+  });
 }
 export async function renameFile(id, name) {
   name = validateFilename(name);
-  // Leitura e alteração na mesma transação para não recriar um arquivo já excluído.
-  const db = await openDatabase();
-  await new Promise((resolve, reject) => {
-    const transaction = db.transaction("files", "readwrite");
-    const store = transaction.objectStore("files");
-    const request = store.get(id);
-    request.onsuccess = () => {
-      if (request.result)
-        store.put({ ...request.result, name, updatedAt: Date.now() });
-      else transaction.abort();
-    };
-    transaction.oncomplete = resolve;
-    transaction.onabort = () =>
-      reject(
-        new Error(
-          "Não foi possível renomear. O arquivo pode ter sido removido.",
-        ),
-      );
-    transaction.onerror = () => {};
+  return changeFiles((entries, store) => {
+    const entry = entries.find((entry) => entry.id === id);
+    if (!entry) throw new Error("O item não está mais disponível.");
+    if (isFolder(entry)) validateFolderName(entries, name, parentOf(entry), id);
+    const updated = { ...entry, name, updatedAt: Date.now() };
+    store.put(updated);
+    return updated;
   });
-  emit("files", id);
 }
 export async function removeFile(id) {
-  await operation("files", "readwrite", (store) => store.delete(id));
-  emit("files", id);
+  return changeFiles((entries, store) => {
+    const entry = entries.find((entry) => entry.id === id);
+    if (!entry) throw new Error("O item não está mais disponível.");
+    if (isFolder(entry) && entries.some((child) => parentOf(child) === id))
+      throw new Error(
+        "A pasta contém itens. Mova ou exclua o conteúdo antes de apagar a pasta.",
+      );
+    store.delete(id);
+    return entry;
+  });
+}
+export function moveFile(id, parentId = null) {
+  return changeFiles((entries, store) => {
+    const entry = entries.find((entry) => entry.id === id);
+    if (!entry) throw new Error("O item não está mais disponível.");
+    validateDestination(entries, parentId, isFolder(entry) ? id : null);
+    if (isFolder(entry)) validateFolderName(entries, entry.name, parentId, id);
+    const updated = { ...entry, parentId, updatedAt: Date.now() };
+    store.put(updated);
+    return updated;
+  });
 }
 export async function exportNote(note) {
   return addFile(

@@ -25,5 +25,6 @@
 
 - Notas com busca, salvamento automático e exportação de cópias `.txt` para Arquivos.
 - Arquivos com importação, busca, prévia, renomear, excluir e download para o computador.
+- Pastas e subpastas com navegação, movimentação de itens e exclusão somente quando vazias.
 - Textos podem ser abertos como novas notas; as cópias originais são independentes.
 - Persistência local em IndexedDB, sem servidor.
