@@ -20,6 +20,10 @@ decorateButton(start, "iniciar");
 clearSelection = setupDesktop((app) => manager.open(app));
 taskbar = setupTaskbar(manager, shutdown);
 
+document
+  .querySelector("#system")
+  .addEventListener("pixel:restore-music", () => manager.restore("music"));
+
 function shutdown() {
   clearInterval(bootTimer);
   manager.closeAll();

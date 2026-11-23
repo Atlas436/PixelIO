@@ -18,6 +18,8 @@ Na pasta do projeto, execute `python3 -m http.server 8080` e abra http://localho
 - `js/music.js` e `music.css`: interface e player do Música.
 - `js/music-links.js`: validação dos links e geração de URLs dos players oficiais.
 - `js/audio-settings.js`: volume compartilhado entre barra e arquivos locais.
+- `js/media-controls.js`: mini player e Media Session do navegador.
+- `js/external-media.js`: integração com as APIs oficiais dos players do YouTube e Spotify.
 - `assets/icones/`: sete PNGs originais da pasta `icones` do Drive e arte do Pixel Studio.
 - `js/settings.js`: preferências e janela de Configurações.
 - `js/taskbar-visibility.js`: ocultação e revelação da barra.
@@ -58,11 +60,17 @@ Abra Música no desktop ou no menu. Não exige conta do Pixel.OI, servidor ou ch
 - **YouTube:** cole um link HTTPS de vídeo, Shorts, transmissão ou playlist e clique em Abrir player. O vídeo usa o player oficial incorporado; há um link para abrir diretamente no YouTube.
 - **Spotify:** cole um link HTTPS de música, álbum, playlist ou podcast de `open.spotify.com`. O conteúdo usa o player oficial, também com link para abrir no serviço.
 
-Os arquivos locais não são enviados à rede. Ficam apenas na janela atual; ao fechar Música ou encerrar o Pixel.OI, o áudio para e as URLs temporárias são liberadas. Minimizar permite continuar ouvindo. Trocar de aba pausa os arquivos locais e remove o player externo anterior para evitar sons simultâneos. Ao reabrir a janela, adicione novamente os arquivos.
+Os arquivos locais não são enviados à rede. Ficam apenas na janela atual; ao fechar Música ou encerrar o Pixel.OI, o áudio para e as URLs temporárias são liberadas. Minimizar permite continuar ouvindo e mostra o mini player. Trocar de aba dentro do Música não interrompe o conteúdo atual: o mini player acompanha a origem ativa. Iniciar outra faixa ou abrir outro link substitui a reprodução anterior. Ao reabrir a janela depois de fechá-la, adicione novamente os arquivos.
+
+O mini player aparece ao minimizar Música, focar outra janela ou consultar outra aba do aplicativo. Ele mostra o conteúdo atual e oferece reproduzir/pausar, ações de faixa quando disponíveis e **Abrir Música** para restaurar a janela. Nos conteúdos externos, o mesmo iframe permanece vivo; apenas a posição muda. O vídeo do YouTube continua visível no mini player, sem esconder ou separar seu áudio.
+
+A API Media Session registra título, estado real de reprodução e comandos compatíveis (reproduzir, pausar, posição e faixas). Navegadores e sistemas compatíveis podem exibir esses comandos na central de mídia, tela de bloqueio ou teclas multimídia. A interface exata e a disponibilidade dependem do navegador, sistema e provedor. Não há tentativa de contornar bloqueios de reprodução em segundo plano.
+
+Os SDKs oficiais do YouTube e Spotify são carregados somente ao abrir um link. Se a API não carregar, o player oficial continua disponível, com o link para abrir o serviço. Os controles externos ficam indisponíveis em vez de simular reprodução. Spotify pode exigir login ou restringir ações de acordo com o conteúdo/conta.
 
 O volume da barra controla os arquivos locais. YouTube e Spotify possuem controles próprios, com disponibilidade, login e eventuais limitações de reprodução determinados pelos serviços. Não há conversão ou download de áudio desses serviços: a opção de baixar serve apenas aos arquivos locais adicionados pelo usuário.
 
-A verificação automatizada reproduz WAV real e testa os controles, volume, fila, download local e liberação dos recursos. Os iframes externos são simulados nos testes para verificar seus links e ciclo de vida; isso não comprova a disponibilidade de cada conteúdo nos serviços reais.
+A verificação automatizada reproduz WAV real e testa os controles, volume, fila, download local e liberação dos recursos. Os iframes e SDKs externos são simulados nos testes para verificar seus links, comandos e ciclo de vida; isso não comprova a disponibilidade de cada conteúdo nos serviços reais. `media-browser-test.cjs` verifica o mini player, Media Session com WAV real, estados/comandos das APIs simuladas, permanência do iframe, restauração e limpeza. Consulte [YouTube IFrame API](https://developers.google.com/youtube/iframe_api_reference) e [Spotify IFrame API](https://developer.spotify.com/documentation/embeds/references/iframe-api).
 
 ## Configurações e barra de tarefas
 

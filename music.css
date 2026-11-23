@@ -251,3 +251,80 @@
     flex-direction: column;
   }
 }
+
+/* O mesmo iframe permanece vivo; em segundo plano vira uma janela compacta. */
+.media-dock {
+  position: fixed;
+  z-index: 1800;
+  right: 16px;
+  bottom: calc(var(--bar) + 12px);
+  width: min(320px, calc(100vw - 24px));
+  background: var(--base);
+  border: 1px solid var(--normal);
+  box-shadow: 5px 5px 0 #100c1e88;
+}
+.media-dock-frame {
+  height: 200px;
+}
+.media-dock-frame iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+.media-dock:not(.media-dock-external) .media-dock-frame {
+  display: none;
+}
+.media-dock-info {
+  padding: 12px;
+}
+.media-dock-provider {
+  color: var(--muted);
+  font-size: 9px;
+  letter-spacing: 1px;
+}
+.media-dock-title {
+  font-size: 12px;
+  color: var(--normal);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin: 8px 0;
+}
+.media-dock-buttons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.media-dock-buttons .pixel-button {
+  width: 32px;
+  min-width: 32px;
+  height: 32px;
+}
+.media-dock-buttons .pixel-art {
+  width: 24px;
+  height: 24px;
+}
+.media-dock-buttons button:disabled {
+  opacity: 0.35;
+  border-color: transparent;
+}
+.media-dock-open {
+  font-size: 10px;
+  color: var(--normal);
+  margin-left: auto;
+  padding: 6px;
+}
+.media-dock.media-dock-embedded {
+  z-index: 1000;
+  box-shadow: none;
+  border: 0;
+  right: auto;
+  bottom: auto;
+}
+.media-dock-embedded .media-dock-info {
+  display: none;
+}
+.media-dock-embedded .media-dock-frame {
+  height: 100%;
+}

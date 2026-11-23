@@ -41,8 +41,17 @@ function wav() {
     await page.route("https://www.youtube-nocookie.com/**", (r) =>
       r.fulfill({ contentType: "text/html", body: "<p>Player externo</p>" }),
     );
+    await page.route("https://www.youtube.com/iframe_api", (r) => r.abort());
+    await page.route("https://open.spotify.com/embed/iframe-api/v1", (r) =>
+      r.abort(),
+    );
     await page.route("https://open.spotify.com/embed/**", (r) =>
-      r.fulfill({ contentType: "text/html", body: "<p>Player externo</p>" }),
+      r.request().resourceType() === "script"
+        ? r.abort()
+        : r.fulfill({
+            contentType: "text/html",
+            body: "<p>Player externo</p>",
+          }),
     );
     await page.addInitScript(() => {
       window.revoked = [];
@@ -118,34 +127,38 @@ function wav() {
     ]);
     assert.equal(download.suggestedFilename(), "primeira.wav");
     await app.getByRole("tab", { name: "YouTube", exact: true }).click();
-    assert(await app.locator("audio").evaluate((a) => a.paused));
+    assert(!(await app.locator("audio").evaluate((a) => a.paused)));
     await app
       .locator("#music-link-youtube")
       .fill("https://evil.test/watch?v=dQw4w9WgXcQ");
     await app.locator('#music-youtube button[type="submit"]').click();
-    assert.equal(await app.locator("iframe").count(), 0);
+    assert.equal(await page.locator(".media-dock iframe").count(), 0);
     await app
       .locator("#music-link-youtube")
       .fill("https://youtu.be/dQw4w9WgXcQ");
     await app.locator('#music-youtube button[type="submit"]').click();
+    const youtubeURL = new URL(
+      await page.locator(".media-dock iframe").getAttribute("src"),
+    );
     assert.equal(
-      await app.locator("iframe").getAttribute("src"),
+      youtubeURL.origin + youtubeURL.pathname,
       "https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ",
     );
+    assert.equal(youtubeURL.searchParams.get("enablejsapi"), "1");
     await app.getByRole("tab", { name: "Spotify", exact: true }).click();
-    assert.equal(await app.locator("#music-youtube iframe").count(), 0);
+    assert.equal(await page.locator(".media-dock iframe").count(), 1);
     await app
       .locator("#music-link-spotify")
       .fill("https://open.spotify.com/track/0123456789abcdefghijkl");
     await app.locator('#music-spotify button[type="submit"]').click();
     assert.equal(
-      await app.locator("iframe").getAttribute("src"),
+      await page.locator(".media-dock iframe").getAttribute("src"),
       "https://open.spotify.com/embed/track/0123456789abcdefghijkl",
     );
     await app.getByRole("tab", { name: "Spotify", exact: true }).focus();
     await page.keyboard.press("Home");
     assert(await app.locator("#music-local").isVisible());
-    assert.equal(await app.locator("iframe").count(), 0);
+    assert.equal(await page.locator(".media-dock iframe").count(), 1);
     await app
       .getByRole("button", { name: "Remover segunda.wav", exact: true })
       .click();
@@ -160,18 +173,21 @@ function wav() {
     await page.locator('.desktop-app[data-app="music"]').dblclick();
     assert.equal(await page.locator(".music-track").count(), 0);
     await page.setViewportSize({ width: 360, height: 640 });
+    await page.waitForFunction(
+      () =>
+        document.querySelector('.window[data-app="music"]').offsetWidth <=
+        innerWidth,
+    );
     assert((await app.boundingBox()).width <= 360);
     assert.equal(
       await page.evaluate(() => document.documentElement.scrollWidth),
       360,
     );
-    await app
-      .locator("#music-files")
-      .setInputFiles({
-        name: "reinicio.wav",
-        mimeType: "audio/wav",
-        buffer: sound,
-      });
+    await app.locator("#music-files").setInputFiles({
+      name: "reinicio.wav",
+      mimeType: "audio/wav",
+      buffer: sound,
+    });
     await page.locator("#power-toggle").click();
     await page.locator("#shutdown").click();
     assert.equal(await page.locator(".music-app").count(), 0);

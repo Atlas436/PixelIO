@@ -1,5 +1,7 @@
 import { iconButton, pixelArt } from "./assets.js";
 import { parseMusicLink } from "./music-links.js";
+import { createMediaControls } from "./media-controls.js";
+import { createExternalMedia } from "./external-media.js";
 import { getVolume, subscribeVolume } from "./audio-settings.js";
 
 const allowedExtension = /\.(mp3|wav|ogg|oga|m4a|aac|flac|webm|opus)$/i;
@@ -32,8 +34,10 @@ export function createMusic() {
   let files = [];
   let nextId = 0;
   let currentId = null;
-  let source = "local";
   let disposed = false;
+  let external = null;
+  let externalProvider = null;
+  const media = createMediaControls(root);
   const audio = document.createElement("audio");
   audio.hidden = true;
   root.append(audio);
@@ -66,6 +70,8 @@ export function createMusic() {
   root.querySelector(".music-add").prepend(pixelArt("upload"));
 
   async function playAudio() {
+    stopExternal();
+    updatePlayer();
     const requestedId = currentId;
     try {
       await audio.play();
@@ -83,6 +89,7 @@ export function createMusic() {
   function selectAt(index, shouldPlay) {
     const file = files[index];
     if (!file) return;
+    stopExternal();
     audio.pause();
     currentId = file.id;
     audio.src = file.url;
@@ -122,6 +129,43 @@ export function createMusic() {
       download.href = file.url;
       download.download = file.name;
     } else download.removeAttribute("href");
+    if (!external)
+      media.update(
+        file
+          ? {
+              local: true,
+              title: file.name,
+              provider: "Meus arquivos",
+              playing,
+              position: audio.currentTime,
+              duration: audio.duration,
+              play: playAudio,
+              pause: () => audio.pause(),
+              stop: () => {
+                audio.pause();
+                audio.currentTime = 0;
+                updatePlayer();
+              },
+              previous:
+                currentIndex() > 0
+                  ? () => selectAt(currentIndex() - 1, true)
+                  : null,
+              next:
+                currentIndex() < files.length - 1
+                  ? () => selectAt(currentIndex() + 1, true)
+                  : null,
+              seek: (seconds) => {
+                if (Number.isFinite(audio.duration)) {
+                  audio.currentTime = Math.max(
+                    0,
+                    Math.min(seconds, audio.duration),
+                  );
+                  updatePlayer();
+                }
+              },
+            }
+          : null,
+      );
   }
   function renderQueue() {
     queue.replaceChildren();
@@ -212,7 +256,14 @@ export function createMusic() {
         "Este áudio não pôde ser aberto. Tente outro arquivo ou formato.";
   });
 
-  const frames = new Map();
+  function stopExternal() {
+    const hadExternal = !!external;
+    external?.dispose();
+    external = null;
+    externalProvider = null;
+    media.frame.replaceChildren();
+    if (hadExternal) media.update(null);
+  }
   for (const provider of ["youtube", "spotify"]) {
     const pane = root.querySelector(`#music-${provider}`);
     const label = provider === "youtube" ? "YouTube" : "Spotify";
@@ -228,16 +279,26 @@ export function createMusic() {
         status.textContent = error.message;
         return;
       }
+      stopExternal();
+      const slot = document.createElement("div");
+      slot.className = "music-embed-slot";
+      slot.style.height = "260px";
+      frameArea.replaceChildren(slot);
+      // Marque a origem antes de pausar o áudio, para não sobrescrever a sessão externa.
+      external = { dispose() {} };
+      externalProvider = provider;
       audio.pause();
-      const iframe = document.createElement("iframe");
-      iframe.title = parsed.title;
-      iframe.allow =
-        "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture";
-      iframe.referrerPolicy = "strict-origin-when-cross-origin";
-      iframe.allowFullscreen = true;
-      iframe.src = parsed.src;
-      frameArea.replaceChildren(iframe);
-      frames.set(provider, iframe);
+      external = createExternalMedia(
+        provider,
+        parsed,
+        media.frame,
+        (state) => {
+          if (!disposed) media.update({ ...state, slot });
+        },
+        (message) => {
+          if (!disposed) status.textContent = message;
+        },
+      );
       open.href = parsed.href;
       open.hidden = false;
       status.textContent = `Link adicionado. Inicie pelo player do ${label}; se não carregar, use o link abaixo.`;
@@ -245,16 +306,6 @@ export function createMusic() {
   }
   const tabs = [...root.querySelectorAll('[role="tab"]')];
   function setTab(value) {
-    if (source !== value) audio.pause();
-    for (const [provider, iframe] of frames) {
-      if (provider !== value) {
-        const message = document.createElement("p");
-        message.textContent = "Cole um link para carregar o player oficial.";
-        iframe.replaceWith(message);
-        frames.delete(provider);
-      }
-    }
-    source = value;
     for (const tab of tabs) {
       const selected = tab.dataset.source === value;
       tab.setAttribute("aria-selected", String(selected));
@@ -263,6 +314,9 @@ export function createMusic() {
     }
     status.textContent = "";
   }
+  root.addEventListener("pixel:restore-music", () => {
+    setTab(externalProvider || "local");
+  });
   tabs.forEach((tab, index) => {
     tab.addEventListener("click", () => setTab(tab.dataset.source));
     tab.addEventListener("keydown", (event) => {
@@ -286,8 +340,8 @@ export function createMusic() {
     unsubscribe();
     for (const file of files) URL.revokeObjectURL(file.url);
     files = [];
-    for (const iframe of frames.values()) iframe.remove();
-    frames.clear();
+    stopExternal();
+    media.dispose();
   };
   setTab("local");
   renderQueue();
