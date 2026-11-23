@@ -20,12 +20,22 @@ export function setupTaskbarVisibility(onLayout) {
     clearTimeout(hideTimer);
     if (!getAutoHide() || hovering || hasFocus() || hasPanel() || announcing)
       return;
+    // Espere a subida terminar antes da tolerância para ocultar novamente.
+    const animation = Math.max(
+      0,
+      ...getComputedStyle(bar)
+        .transitionDuration.split(",")
+        .map(
+          (value) =>
+            parseFloat(value) * (value.trim().endsWith("ms") ? 1 : 1000),
+        ),
+    );
     hideTimer = setTimeout(() => {
       if (!getAutoHide() || hovering || hasFocus() || hasPanel() || announcing)
         return;
       system.classList.add("taskbar-hidden");
       edge.setAttribute("aria-expanded", "false");
-    }, 700);
+    }, 700 + animation);
   }
   function apply() {
     system.classList.toggle("taskbar-autohide", getAutoHide());
