@@ -1,3 +1,4 @@
+import { createGallery } from "./gallery.js";
 import { createNotes } from "./notes.js";
 import { createFiles } from "./files.js";
 import { createMusic } from "./music.js";
@@ -89,6 +90,7 @@ export function placeholder(app) {
 }
 
 export function appContent(app) {
+  if (app.id === "gallery") return createGallery();
   if (app.id === "notes") return createNotes();
   if (app.id === "files") return createFiles();
   if (app.id === "music") return createMusic();

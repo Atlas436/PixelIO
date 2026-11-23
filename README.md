@@ -1,6 +1,6 @@
 # Pixel.OI
 
-Sistema operacional fictício em pixel art, executado inteiramente no navegador. Primeira etapa: apresentação, boot simulado, desktop, menu com dez aplicativos e gerenciador reutilizável de janelas. Agora inclui Paciência Spider com três dificuldades e os aplicativos Música, Notas e Arquivos. Não há servidor de aplicação, autenticação, Supabase ou IA nesta etapa.
+Sistema operacional fictício em pixel art, executado inteiramente no navegador. Primeira etapa: apresentação, boot simulado, desktop, menu com dez aplicativos e gerenciador reutilizável de janelas. Agora inclui Paciência Spider com três dificuldades e os aplicativos Música, Notas, Arquivos e Galeria. Não há servidor de aplicação, autenticação, Supabase ou IA nesta etapa.
 
 ## Executar localmente
 
@@ -19,6 +19,7 @@ Na pasta do projeto, execute `python3 -m http.server 8080` e abra http://localho
 - `js/documents-store.js`: dados locais compartilhados em IndexedDB.
 - `js/file-tree.js`: caminhos e validação da hierarquia de pastas.
 - `js/document-dialog.js` e `documents.css`: confirmações e visual desses dois aplicativos.
+- `js/gallery.js` e `js/images.js`: Galeria, validação de imagens e exportação de notas com imagens.
 - `js/music.js` e `music.css`: interface e player do Música.
 - `js/music-links.js`: validação dos links e geração de URLs dos players oficiais.
 - `js/audio-settings.js`: volume compartilhado entre barra e arquivos locais.
@@ -54,7 +55,7 @@ Clique em Iniciar Pixel.OI e aguarde a simulação visual do boot. No desktop, u
 
 Arraste uma janela pela barra de título. Use os PNGs para minimizar, maximizar/restaurar e fechar; duplo clique no título também maximiza/restaura. A barra de tarefas restaura janelas minimizadas e alterna o foco; clicar no aplicativo ativo o minimiza. Janelas são mantidas na área visível, inclusive ao redimensionar a tela.
 
-Os painéis fecham com Escape ou clique fora. Energia → Encerrar Pixel.OI retorna à apresentação e fecha as janelas. O relógio segue o horário local do navegador. O volume controla os arquivos locais do Música; não altera o volume do computador nem dos players externos. Paciência abre a Spider; Música oferece players e arquivos locais; Notas e Arquivos compartilham documentos locais; Configurações contém as preferências da barra. Os demais aplicativos exibem conteúdo temporário.
+Os painéis fecham com Escape ou clique fora. Energia → Encerrar Pixel.OI retorna à apresentação e fecha as janelas. O relógio segue o horário local do navegador. O volume controla os arquivos locais do Música; não altera o volume do computador nem dos players externos. Paciência abre a Spider; Música oferece players e arquivos locais; Notas, Arquivos e Galeria compartilham documentos locais; Configurações contém as preferências da barra. Os demais aplicativos exibem conteúdo temporário.
 
 ## Notas e Arquivos
 
@@ -66,6 +67,8 @@ Os dois aplicativos usam IndexedDB, um armazenamento local do navegador. Não h�
 - **Salvar agora** grava imediatamente. A mensagem de salvamento só confirma depois da conclusão da gravação.
 - A busca considera título e conteúdo, sem diferenciar maiúsculas e acentos.
 - **Exportar .txt** cria uma cópia UTF-8 em **Arquivos**. O arquivo exportado é uma fotografia do conteúdo daquele momento; novas exportações criam outras cópias e não sobrescrevem as anteriores. Podem existir cópias com o mesmo nome, identificadas separadamente.
+- **Imagem do PC** anexa uma ou mais imagens ao fim da nota; **Imagem da Galeria** permite escolher uma imagem já importada. Cada anexo é uma cópia independente, salva junto da nota. Remover um anexo pede confirmação e não apaga o original da Galeria.
+- **Exportar com imagens** cria em Arquivos um HTML independente com texto e imagens embutidas, que pode ser baixado e aberto no navegador sem conexão. O texto é escapado e não executa HTML fornecido na nota. A exportação `.txt` contém somente o texto. Também é possível baixar cada imagem da nota separadamente.
 - **Abrir Arquivos** leva ao outro aplicativo para consultar ou baixar as exportações.
 - **Excluir nota** pede confirmação e mantém os arquivos já exportados.
 
@@ -85,6 +88,14 @@ Fechar a janela ou trocar de nota força a gravação pendente. Se o navegador n
 - Excluir um arquivo remove somente a cópia do Pixel.OI; não exclui a nota original nem arquivos no computador.
 
 A lista acompanha importações/exportações enquanto os aplicativos estão abertos. As imagens de prévia e os downloads usam URLs temporárias liberadas após o uso.
+
+### Galeria
+
+- **Importar imagens do PC** adiciona imagens PNG, JPEG, GIF, WebP, BMP ou AVIF, até 20 MB por imagem. A importação valida se o navegador consegue decodificá-las; SVG não é aceito.
+- Mostra as imagens de todas as pastas de Arquivos em uma grade com busca por nome. As importações da Galeria ficam na raiz de Arquivos; mover ou renomear por lá atualiza a Galeria.
+- Selecione uma miniatura para ampliar e **Baixar imagem no PC**. O download preserva os bytes do arquivo original.
+- **Excluir imagem** pede confirmação e remove o item compartilhado com Arquivos. Cópias inseridas em notas e arquivos já baixados continuam intactos.
+- As imagens ficam no mesmo navegador/perfil, sem envio à rede. Limpar os dados do site também apaga a Galeria e as imagens das notas; mantenha cópias no computador.
 
 ## Música
 
@@ -171,3 +182,5 @@ Os testes `music-links-test.mjs` e `music-browser-test.cjs` cobrem URLs aceitas/
 `npm run test:documents` executa os testes de nomes/busca e a integração real em IndexedDB no Chromium: autosave, busca, exportação Notas→Arquivos, cópias independentes, renomear, download UTF-8, abertura no Notas, confirmações, fechamento com edição pendente, importação segura, imagens, persistência após recarregar, tela pequena e erro de armazenamento. O servidor local deve estar aberto.
 
 `npm run test:folders` verifica criação, navegação, subpastas, movimentação, preservação de arquivos antigos, persistência, exclusão de pastas vazias e recusa de destinos inválidos, incluindo tela pequena no Chromium.
+
+`npm run test:images` verifica importação e validação da Galeria, download com bytes originais, anexos em notas, persistência, cópias independentes, remoção confirmada, exportação HTML com imagens embutidas e texto escapado, compatibilidade com TXT e tela pequena.
