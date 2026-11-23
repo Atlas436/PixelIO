@@ -1,5 +1,10 @@
 // Dados locais compartilhados pelos apps Notas e Arquivos. Nenhum arquivo é enviado.
-import { parentOf, isFolder, validateDestination } from "./file-tree.js";
+import {
+  parentOf,
+  isFolder,
+  validateDestination,
+  folderTrail,
+} from "./file-tree.js";
 const listeners = new Set();
 let database;
 export const newDocumentId = () => crypto.randomUUID();
@@ -221,6 +226,41 @@ export function moveFile(id, parentId = null) {
     const updated = { ...entry, parentId, updatedAt: Date.now() };
     store.put(updated);
     return updated;
+  });
+}
+// Um único commit: qualquer destino inválido cancela todo o lote.
+export function moveFiles(ids, parentId = null) {
+  return changeFiles((entries, store) => {
+    const selected = [...new Set(ids)].map((id) => {
+      const entry = entries.find((item) => item.id === id);
+      if (!entry)
+        throw new Error(
+          "Um dos itens não está mais disponível. Atualize a seleção.",
+        );
+      return entry;
+    });
+    if (!selected.length) throw new Error("Selecione pelo menos um item.");
+    for (const entry of selected)
+      validateDestination(entries, parentId, isFolder(entry) ? entry.id : null);
+    const roots = selected.filter((entry) => {
+      const trail = folderTrail(entries, parentOf(entry)) || [];
+      return !trail.some((folder) =>
+        selected.some((item) => item.id === folder.id),
+      );
+    });
+    const moved = roots.map((entry) => ({
+      ...entry,
+      parentId,
+      updatedAt: Date.now(),
+    }));
+    const projected = entries.map(
+      (entry) => moved.find((item) => item.id === entry.id) || entry,
+    );
+    for (const entry of moved)
+      if (isFolder(entry))
+        validateFolderName(projected, entry.name, parentId, entry.id);
+    for (const entry of moved) store.put(entry);
+    return moved;
   });
 }
 export async function exportNote(note) {

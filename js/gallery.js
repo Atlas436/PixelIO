@@ -66,7 +66,7 @@ export function createGallery() {
     const meta = document.createElement("p");
     meta.textContent = `${formatBytes(file.size)} · Original preservado`;
     const actions = document.createElement("div");
-    actions.className = "document-toolbar";
+    actions.className = "document-toolbar gallery-actions";
     button(
       "download",
       "Baixar imagem no PC",
@@ -90,7 +90,10 @@ export function createGallery() {
       },
       actions,
     );
-    preview.append(heading, image, meta, actions);
+    const content = document.createElement("div");
+    content.className = "gallery-preview-content";
+    content.append(heading, image, meta);
+    preview.append(content, actions);
   }
   function render() {
     urls.clear();
