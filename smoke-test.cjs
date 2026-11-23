@@ -101,6 +101,9 @@ const assert = require("node:assert/strict");
   await page.locator("#volume-level").fill("25");
   assert.equal(await page.locator("#volume-value").textContent(), "25%");
   await page.keyboard.press("Escape");
+  await page.waitForFunction(() =>
+    [...document.images].every((image) => image.complete),
+  );
   const badImages = await page
     .locator("img")
     .evaluateAll((images) =>

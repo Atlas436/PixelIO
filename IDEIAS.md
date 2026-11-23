@@ -20,3 +20,10 @@
 - Mostrar ao alcançar a borda inferior, pelo toque na alça ou por Alt + T.
 - Avisos internos dos aplicativos revelam a barra temporariamente.
 - Futuras funcionalidades podem usar `notifyApp(appId, mensagem)` de `js/notifications.js`.
+
+## Notas e Arquivos — primeira versão implementada
+
+- Notas com busca, salvamento automático e exportação de cópias `.txt` para Arquivos.
+- Arquivos com importação, busca, prévia, renomear, excluir e download para o computador.
+- Textos podem ser abertos como novas notas; as cópias originais são independentes.
+- Persistência local em IndexedDB, sem servidor.

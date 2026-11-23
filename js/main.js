@@ -1,3 +1,4 @@
+import { apps } from "./apps.js";
 import { decorateButton } from "./assets.js";
 import { setupDesktop } from "./desktop.js";
 import { setupTaskbar } from "./taskbar.js";
@@ -23,6 +24,18 @@ taskbar = setupTaskbar(manager, shutdown);
 document
   .querySelector("#system")
   .addEventListener("pixel:restore-music", () => manager.restore("music"));
+
+document
+  .querySelector("#system")
+  .addEventListener("pixel:open-files", () =>
+    manager.open(apps.find((app) => app.id === "files")),
+  );
+document
+  .querySelector("#system")
+  .addEventListener("pixel:open-note", (event) => {
+    manager.open(apps.find((app) => app.id === "notes"));
+    document.querySelector(".notes-app")?.openNote(event.detail.id);
+  });
 
 function shutdown() {
   clearInterval(bootTimer);
