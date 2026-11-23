@@ -17,6 +17,7 @@ Na pasta do projeto, execute `python3 -m http.server 8080` e abra http://localho
 - `js/apps.js`: catálogo, ícones e abertura dos aplicativos implementados.
 - `js/notes.js` e `js/files.js`: aplicativos Notas e Arquivos.
 - `js/documents-store.js`: dados locais compartilhados em IndexedDB.
+- `js/file-tree.js`: caminhos e validação da hierarquia de pastas.
 - `js/document-dialog.js` e `documents.css`: confirmações e visual desses dois aplicativos.
 - `js/music.js` e `music.css`: interface e player do Música.
 - `js/music-links.js`: validação dos links e geração de URLs dos players oficiais.
@@ -73,6 +74,10 @@ Fechar a janela ou trocar de nota força a gravação pendente. Se o navegador n
 ### Arquivos
 
 - Mostra as notas exportadas e os arquivos escolhidos em **Importar arquivos**. Não acessa automaticamente pastas ou downloads do computador.
+- **Nova pasta** cria pastas e subpastas. Abra com duplo clique ou **Abrir pasta**; use **Voltar** ou o caminho acima da lista para navegar.
+- **Mover** leva o item selecionado para outra pasta, preservando seu conteúdo. Não permite mover uma pasta para dentro dela mesma ou de suas subpastas.
+- Importações entram na pasta aberta; exportações do Notas entram na raiz. A busca mostra itens da pasta atual. Os arquivos anteriores continuam na raiz.
+- Pastas podem ser renomeadas e só podem ser excluídas quando estiverem vazias. A organização permanece salva no mesmo navegador.
 - Busca pelo nome; permite renomear, excluir com confirmação e **Baixar no computador**.
 - Textos de até 1 MB são exibidos como texto puro. HTML e JavaScript importados não são executados. Imagens PNG, JPEG, GIF, WebP, BMP e AVIF podem ser visualizadas.
 - Outros formatos e textos maiores podem ser baixados para abrir em outro aplicativo.
@@ -164,3 +169,5 @@ O teste `smoke-test.cjs` cobre apresentação e boot, seleção, abertura dos de
 Os testes `music-links-test.mjs` e `music-browser-test.cjs` cobrem URLs aceitas/rejeitadas, ícones, reprodução WAV real, fila, pausa, posição, volume, minimizar, download local, troca de players, fechamento e encerramento, incluindo tela pequena. `npm run test:music` executa somente essas verificações (servidor local aberto).
 
 `npm run test:documents` executa os testes de nomes/busca e a integração real em IndexedDB no Chromium: autosave, busca, exportação Notas→Arquivos, cópias independentes, renomear, download UTF-8, abertura no Notas, confirmações, fechamento com edição pendente, importação segura, imagens, persistência após recarregar, tela pequena e erro de armazenamento. O servidor local deve estar aberto.
+
+`npm run test:folders` verifica criação, navegação, subpastas, movimentação, preservação de arquivos antigos, persistência, exclusão de pastas vazias e recusa de destinos inválidos, incluindo tela pequena no Chromium.

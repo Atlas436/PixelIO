@@ -4,11 +4,12 @@
   "private": true,
   "description": "Sistema operacional fictício em pixel art no navegador",
   "scripts": {
-    "check": "node --check js/main.js && node --check js/apps.js && node --check js/assets.js && node --check js/desktop.js && node --check js/taskbar.js && node --check js/windows.js && node --check js/spider.js && node --check js/spider-rules.js && node --check js/spider-cards.js && node --check js/settings.js && node --check js/notifications.js && node --check js/taskbar-visibility.js && node --check js/spider-drag.js && node --check js/music.js && node --check js/music-links.js && node --check js/audio-settings.js && node --check js/media-controls.js && node --check js/external-media.js && node --check js/documents-store.js && node --check js/document-dialog.js && node --check js/notes.js && node --check js/files.js",
-    "test": "npm run test:spider && node smoke-test.cjs && node spider-browser-test.cjs && node taskbar-browser-test.cjs && npm run test:music && npm run test:documents",
+    "check": "node --check js/main.js && node --check js/apps.js && node --check js/assets.js && node --check js/desktop.js && node --check js/taskbar.js && node --check js/windows.js && node --check js/spider.js && node --check js/spider-rules.js && node --check js/spider-cards.js && node --check js/settings.js && node --check js/notifications.js && node --check js/taskbar-visibility.js && node --check js/spider-drag.js && node --check js/music.js && node --check js/music-links.js && node --check js/audio-settings.js && node --check js/media-controls.js && node --check js/external-media.js && node --check js/documents-store.js && node --check js/document-dialog.js && node --check js/notes.js && node --check js/files.js && node --check js/file-tree.js",
+    "test": "npm run test:spider && node smoke-test.cjs && node spider-browser-test.cjs && node taskbar-browser-test.cjs && npm run test:music && npm run test:documents && npm run test:folders",
     "test:spider": "node --test spider-test.mjs",
     "test:music": "node --test music-links-test.mjs && node music-browser-test.cjs && node media-browser-test.cjs",
-    "test:documents": "node --test documents-store-test.mjs && node documents-browser-test.cjs"
+    "test:documents": "node --test documents-store-test.mjs && node documents-browser-test.cjs",
+    "test:folders": "node --test folders-test.mjs && node folders-browser-test.cjs"
   },
   "devDependencies": {
     "playwright": "1.65.1"
