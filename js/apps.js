@@ -1,3 +1,4 @@
+import { createGuide } from "./guide.js";
 import { createTerminal } from "./terminal.js";
 import { createAbout } from "./about.js";
 import { createGallery } from "./gallery.js";
@@ -81,6 +82,7 @@ export function placeholder(app) {
 }
 
 export function appContent(app) {
+  if (app.id === "assistant") return createGuide();
   if (app.id === "terminal") return createTerminal();
   if (app.id === "about") return createAbout();
   if (app.id === "gallery") return createGallery();

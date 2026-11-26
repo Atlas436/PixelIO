@@ -15,6 +15,7 @@ test("comandos Pixel, espaços, acentos e aliases", () => {
   ])
     assert.equal(parsePixel(input).type, type);
   for (const [name, id] of [
+    ["guia", "assistant"],
     ["notas", "notes"],
     ["MÚSICA", "music"],
     ["musica", "music"],
