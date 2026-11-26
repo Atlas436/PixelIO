@@ -31,3 +31,10 @@
 - Legendas e reordenação nas notas, ações fixas na Galeria e movimentação de vários itens em Arquivos.
 - Textos podem ser abertos como novas notas; as cópias originais são independentes.
 - Persistência local em IndexedDB, sem servidor.
+
+## Terminal e Sobre — implementados
+
+- Linguagem Pixel: ajuda, abrir apps, listar, versão, limpar e sobre; histórico com as setas.
+- Sobre com Julia, Lais e Geovanna, proposta, inspiração em desktops antigos/Windows96 e lista de códigos.
+- Artigo do projeto aguardando o link definitivo.
+- Assistente IA fica para uma próxima etapa; Pixel Studio permanece por último.

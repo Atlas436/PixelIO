@@ -1,3 +1,5 @@
+import { createTerminal } from "./terminal.js";
+import { createAbout } from "./about.js";
 import { createGallery } from "./gallery.js";
 import { createNotes } from "./notes.js";
 import { createFiles } from "./files.js";
@@ -6,19 +8,8 @@ import { createSpider } from "./spider.js";
 import { createSettings } from "./settings.js";
 import { pixelArt } from "./assets.js";
 
-// Ícones originais do Drive; Studio usa a arte criada para o projeto.
-export const apps = [
-  { id: "files", name: "Arquivos", initials: "AR" },
-  { id: "music", name: "Música", initials: "MU" },
-  { id: "terminal", name: "Terminal", initials: "TE" },
-  { id: "notes", name: "Notas", initials: "NO" },
-  { id: "assistant", name: "Assistente IA", initials: "IA" },
-  { id: "solitaire", name: "Paciência", initials: "PA" },
-  { id: "studio", name: "Pixel Studio", initials: "PS" },
-  { id: "settings", name: "Configurações", initials: "CO" },
-  { id: "gallery", name: "Galeria", initials: "GA" },
-  { id: "about", name: "Sobre", initials: "SO" },
-];
+import { apps } from "./app-catalog.js";
+export { apps };
 
 const iconFiles = {
   files: "arquivo.png",
@@ -90,6 +81,8 @@ export function placeholder(app) {
 }
 
 export function appContent(app) {
+  if (app.id === "terminal") return createTerminal();
+  if (app.id === "about") return createAbout();
   if (app.id === "gallery") return createGallery();
   if (app.id === "notes") return createNotes();
   if (app.id === "files") return createFiles();

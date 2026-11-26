@@ -37,6 +37,11 @@ document
     document.querySelector(".notes-app")?.openNote(event.detail.id);
   });
 
+system.addEventListener("pixel:open-app", (event) => {
+  const app = apps.find((app) => app.id === event.detail?.id);
+  if (app) manager.open(app);
+});
+
 function shutdown() {
   clearInterval(bootTimer);
   manager.closeAll();
