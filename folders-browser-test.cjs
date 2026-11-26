@@ -50,7 +50,7 @@ const fs = require("node:fs");
         };
       });
     });
-    await page.locator('.desktop-app[data-app="files"]').dblclick();
+    await page.locator('.desktop-app[data-app="files"]').click();
     const app = page.locator(".files-app");
     await app
       .locator(".files-list button")
@@ -204,7 +204,7 @@ const fs = require("node:fs");
     );
     assert.equal(await app.locator(".files-list [data-file-id]").count(), 2);
     await boot();
-    await page.locator('.desktop-app[data-app="files"]').dblclick();
+    await page.locator('.desktop-app[data-app="files"]').click();
     await app.locator(`[data-folder-id="${a}"]`).dblclick();
     await app.locator(`[data-folder-id="${child}"]`).dblclick();
     assert.equal(await app.locator(".files-list [data-file-id]").count(), 2);

@@ -27,7 +27,7 @@ const fs = require("node:fs");
         .locator("#system")
         .evaluate((e) => e.classList.contains("taskbar-autohide"))),
     );
-    await page.locator('.desktop-app[data-app="settings"]').dblclick();
+    await page.locator('.desktop-app[data-app="settings"]').click();
     assert.equal(await page.locator(".settings-app").count(), 1);
     assert.equal(
       await page
@@ -141,7 +141,7 @@ const fs = require("node:fs");
         .locator("#system")
         .evaluate((e) => e.classList.contains("taskbar-autohide")),
     );
-    await page.locator('.desktop-app[data-app="settings"]').dblclick();
+    await page.locator('.desktop-app[data-app="settings"]').click();
     assert(await toggle.isChecked());
     // O modo maximizado acompanha a alteração da área útil.
     await page
@@ -179,7 +179,7 @@ const fs = require("node:fs");
       });
     });
     await boot(restricted);
-    await restricted.locator('.desktop-app[data-app="settings"]').dblclick();
+    await restricted.locator('.desktop-app[data-app="settings"]').click();
     await restricted.locator("#taskbar-autohide").check();
     assert.match(
       await restricted.locator(".settings-save-status").textContent(),

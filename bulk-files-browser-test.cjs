@@ -37,7 +37,7 @@ const assert = require("node:assert/strict");
         duplicate: duplicate.id,
       };
     });
-    await page.locator('.desktop-app[data-app="files"]').dblclick();
+    await page.locator('.desktop-app[data-app="files"]').click();
     const app = page.locator(".files-app");
     await app
       .getByRole("checkbox", { name: "Selecionar a.txt", exact: true })

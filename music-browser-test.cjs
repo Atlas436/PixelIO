@@ -70,7 +70,7 @@ function wav() {
         (i) => i.complete && i.naturalWidth > 0,
       ),
     );
-    await page.locator('.desktop-app[data-app="music"]').dblclick();
+    await page.locator('.desktop-app[data-app="music"]').click();
     const app = page.locator(".music-app");
     await app.waitFor();
     assert(
@@ -170,7 +170,7 @@ function wav() {
       .click();
     assert(await oldAudio.evaluate((a) => a.paused && !a.hasAttribute("src")));
     assert.equal(await page.evaluate(() => window.revoked.length), 2);
-    await page.locator('.desktop-app[data-app="music"]').dblclick();
+    await page.locator('.desktop-app[data-app="music"]').click();
     assert.equal(await page.locator(".music-track").count(), 0);
     await page.setViewportSize({ width: 360, height: 640 });
     await page.waitForFunction(

@@ -65,7 +65,7 @@ const spotifyMock = `window.onSpotifyIframeApiReady({createController(element,op
     await p.goto(process.env.PIXEL_URL || "http://localhost:8080");
     await p.locator("#start").click();
     await p.locator("#system").waitFor({ state: "visible" });
-    await p.locator('.desktop-app[data-app="music"]').dblclick();
+    await p.locator('.desktop-app[data-app="music"]').click();
     const app = p.locator(".music-app"),
       win = p.locator('.window[data-app="music"]');
     await app.locator("#music-files").setInputFiles([

@@ -28,7 +28,7 @@ const fs = require("node:fs");
     await page.goto(process.env.PIXEL_URL || "http://localhost:8080");
     await page.locator("#start").click();
     await page.locator("#system").waitFor({ state: "visible" });
-    await page.locator('.desktop-app[data-app="solitaire"]').dblclick();
+    await page.locator('.desktop-app[data-app="solitaire"]').click();
     const app = page.locator(".spider-app");
     const win = page.locator('.window[data-app="solitaire"]');
     assert.equal(await page.locator(".spider-mode").count(), 3);
@@ -214,7 +214,7 @@ const fs = require("node:fs");
     await win
       .getByRole("button", { name: "Fechar Paciência", exact: true })
       .click();
-    await page.locator('.desktop-app[data-app="solitaire"]').dblclick();
+    await page.locator('.desktop-app[data-app="solitaire"]').click();
     await page
       .getByRole("button", { name: "Continuar partida", exact: true })
       .click();

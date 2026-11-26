@@ -25,7 +25,7 @@ const fs = require("node:fs/promises");
       await page.locator("#system").waitFor({ state: "visible" });
     }
     async function open(id) {
-      await page.locator(`.desktop-app[data-app="${id}"]`).dblclick();
+      await page.locator(`.desktop-app[data-app="${id}"]`).click();
     }
     async function savedImages(n) {
       await page.waitForFunction(async (n) => {
