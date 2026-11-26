@@ -24,8 +24,8 @@ const fs = require("node:fs");
     await boot(page);
     const notes = page.locator(".notes-app"),
       files = page.locator(".files-app");
-    await page.locator('.desktop-app[data-app="files"]').dblclick();
-    await page.locator('.desktop-app[data-app="notes"]').dblclick();
+    await page.locator('.desktop-app[data-app="files"]').click();
+    await page.locator('.desktop-app[data-app="notes"]').click();
     await notes.getByRole("button", { name: "Nova nota", exact: true }).click();
     await notes.locator("#note-title").fill("Memória da aula");
     const body =
@@ -129,7 +129,7 @@ const fs = require("node:fs");
         (note) => note.body === "Não perder ao fechar.",
       );
     });
-    await page.locator('.desktop-app[data-app="notes"]').dblclick();
+    await page.locator('.desktop-app[data-app="notes"]').click();
     await notes
       .locator(".notes-list button")
       .filter({ hasText: "Rascunho ao fechar" })
@@ -196,7 +196,7 @@ const fs = require("node:fs");
       () => document.querySelectorAll(".files-list button").length === 3,
     );
     await boot(page);
-    await page.locator('.desktop-app[data-app="notes"]').dblclick();
+    await page.locator('.desktop-app[data-app="notes"]').click();
     await notes
       .locator(".notes-list button")
       .filter({ hasText: "Memória da aula" })
@@ -205,7 +205,7 @@ const fs = require("node:fs");
       await notes.locator("#note-body").inputValue(),
       "Versão atualizada",
     );
-    await page.locator('.desktop-app[data-app="files"]').dblclick();
+    await page.locator('.desktop-app[data-app="files"]').click();
     await files
       .locator(".files-list button")
       .filter({ hasText: "Minha cópia.txt" })
@@ -236,7 +236,7 @@ const fs = require("node:fs");
       });
     });
     await boot(failed);
-    await failed.locator('.desktop-app[data-app="notes"]').dblclick();
+    await failed.locator('.desktop-app[data-app="notes"]').click();
     const blocked = failed.locator(".notes-app");
     await blocked
       .getByRole("button", { name: "Nova nota", exact: true })
@@ -252,7 +252,7 @@ const fs = require("node:fs");
       .locator('.window[data-app="notes"]')
       .getByRole("button", { name: "Fechar Notas", exact: true })
       .click();
-    await failed.locator('.desktop-app[data-app="notes"]').dblclick();
+    await failed.locator('.desktop-app[data-app="notes"]').click();
     await blocked
       .locator(".notes-list button")
       .filter({ hasText: "Ainda na sessão" })

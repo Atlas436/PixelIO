@@ -433,6 +433,8 @@ output {
   gap: 12px;
 }
 .window-title {
+  min-width: 0;
+  flex: 1;
   font-size: 13px;
   overflow: hidden;
   white-space: nowrap;
@@ -441,15 +443,17 @@ output {
   font-weight: normal;
 }
 .window-controls {
+  flex-shrink: 0;
   display: flex;
   gap: 2px;
 }
 .window-controls .pixel-button {
-  width: 34px;
-  min-width: 34px;
-  height: 34px;
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
 }
 .window-controls .pixel-art {
+  pointer-events: none;
   width: 32px;
   height: 32px;
 }

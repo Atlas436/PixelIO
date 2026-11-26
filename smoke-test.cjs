@@ -25,8 +25,7 @@ const assert = require("node:assert/strict");
   assert.equal(await page.locator(".desktop-app").count(), 10);
   const files = page.locator('.desktop-app[data-app="files"]');
   await files.click();
-  assert.equal(await page.locator(".window").count(), 0);
-  await files.dblclick();
+  assert.equal(await page.locator(".window").count(), 1);
   const win = page.locator('.window[data-app="files"]');
   await win.waitFor();
   await win

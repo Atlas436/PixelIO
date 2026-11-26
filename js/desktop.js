@@ -13,23 +13,16 @@ export function setupDesktop(open) {
     const button = document.createElement("button");
     button.className = "desktop-app";
     button.dataset.app = app.id;
-    button.title = `${app.name} — duplo clique para abrir`;
+    button.title = `${app.name} — clique para abrir`;
     button.setAttribute("aria-pressed", "false");
     const name = document.createElement("span");
     name.className = "app-name";
     name.textContent = app.name;
     button.append(placeholder(app), name);
-    button.addEventListener("click", () => select(button));
-    button.addEventListener("dblclick", () => open(app));
-    button.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") {
-        event.preventDefault();
-        open(app);
-      }
-    });
-    // Em telas de toque, um toque abre; o desktop mantém o duplo clique com mouse.
-    button.addEventListener("pointerup", (event) => {
-      if (event.pointerType === "touch") open(app);
+    // O click nativo atende mouse, toque, Enter e Espaço sem abrir duas vezes.
+    button.addEventListener("click", () => {
+      select(button);
+      open(app);
     });
     desktop.append(button);
   }

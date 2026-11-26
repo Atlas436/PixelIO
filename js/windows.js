@@ -151,11 +151,21 @@ export class WindowManager {
     this.focus(id);
   }
 
+  release(state) {
+    try {
+      state.dispose();
+    } catch (error) {
+      // Um app com erro de limpeza não pode prender sua janela ou o encerramento.
+      console.error(`Falha ao liberar ${state.app.name}:`, error);
+    } finally {
+      state.element.remove();
+    }
+  }
+
   close(id) {
     const state = this.windows.get(id);
     if (!state) return;
-    state.dispose();
-    state.element.remove();
+    this.release(state);
     this.windows.delete(id);
     if (this.activeId === id) this.focusNext();
     else this.onChange();
@@ -163,8 +173,7 @@ export class WindowManager {
 
   closeAll() {
     for (const state of this.windows.values()) {
-      state.dispose();
-      state.element.remove();
+      this.release(state);
     }
     this.windows.clear();
     this.activeId = null;

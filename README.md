@@ -51,9 +51,9 @@ Paleta: fundo `#1F1833`, normal `#94D2D4`, hover `#63C2C9`, pressed `#4C93AD`. R
 
 ## Usar
 
-Clique em Iniciar Pixel.OI e aguarde a simulação visual do boot. No desktop, um clique seleciona e dois cliques abrem um aplicativo. Enter abre o atalho focado; em telas de toque, um toque abre. O menu também abre todos os aplicativos com um clique.
+Clique em Iniciar Pixel.OI e aguarde a simulação visual do boot. No desktop, um clique abre o aplicativo. Enter ou Espaço abre o atalho focado; em telas de toque, um toque abre. O menu também abre todos os aplicativos com um clique.
 
-Arraste uma janela pela barra de título. Use os PNGs para minimizar, maximizar/restaurar e fechar; duplo clique no título também maximiza/restaura. A barra de tarefas restaura janelas minimizadas e alterna o foco; clicar no aplicativo ativo o minimiza. Janelas são mantidas na área visível, inclusive ao redimensionar a tela.
+Arraste uma janela pela barra de título. Os controles têm área de 44 px, preservando os PNGs originais. Use-os para minimizar, maximizar/restaurar e fechar; duplo clique no título também maximiza/restaura. A barra de tarefas restaura janelas minimizadas e alterna o foco; clicar no aplicativo ativo o minimiza. Janelas são mantidas na área visível, inclusive ao redimensionar a tela.
 
 Os painéis fecham com Escape ou clique fora. Energia → Encerrar Pixel.OI retorna à apresentação e fecha as janelas. O relógio segue o horário local do navegador. O volume controla os arquivos locais do Música; não altera o volume do computador nem dos players externos. Paciência abre a Spider; Música oferece players e arquivos locais; Notas, Arquivos e Galeria compartilham documentos locais; Configurações contém as preferências da barra. Os demais aplicativos exibem conteúdo temporário.
 
@@ -189,3 +189,5 @@ Os testes `music-links-test.mjs` e `music-browser-test.cjs` cobrem URLs aceitas/
 `npm run test:images` verifica importação e validação da Galeria, download com bytes originais, anexos em notas, persistência, cópias independentes, remoção confirmada, exportação HTML com imagens embutidas e texto escapado, compatibilidade com TXT e tela pequena.
 
 Esses testes também verificam legendas, reordenação persistente e ações visíveis da Galeria. `test:folders` inclui `bulk-files-browser-test.cjs`, com seleção múltipla, busca, preservação dos bytes e cancelamento atômico em conflitos de nome ou ciclos.
+
+`npm run test:windows` verifica abertura com um clique nos dez apps, fechamento pelos cantos dos controles, Enter/Espaço, toque, salvamento de notas ao fechar e encerramento mesmo quando a limpeza de um app falha. Os testes existentes do desktop e dos apps usam a abertura por clique.
