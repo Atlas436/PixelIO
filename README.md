@@ -1,6 +1,6 @@
 # Pixel.OI
 
-Sistema operacional fictício em pixel art, executado inteiramente no navegador. Primeira etapa: apresentação, boot simulado, desktop, menu com dez aplicativos e gerenciador reutilizável de janelas. Agora inclui Paciência Spider com três dificuldades e os aplicativos Música, Notas, Arquivos e Galeria. Não há servidor de aplicação, autenticação, Supabase ou IA nesta etapa.
+Sistema operacional fictício em pixel art, executado inteiramente no navegador. Primeira etapa: apresentação, boot simulado, desktop, menu com dez aplicativos e gerenciador reutilizável de janelas. Agora inclui Paciência Spider com três dificuldades e os aplicativos Música, Notas, Arquivos, Galeria, Terminal e Sobre. Não há servidor de aplicação, autenticação, Supabase ou IA nesta etapa.
 
 ## Executar localmente
 
@@ -55,7 +55,7 @@ Clique em Iniciar Pixel.OI e aguarde a simulação visual do boot. No desktop, u
 
 Arraste uma janela pela barra de título. Os controles têm área de 44 px, preservando os PNGs originais. Use-os para minimizar, maximizar/restaurar e fechar; duplo clique no título também maximiza/restaura. A barra de tarefas restaura janelas minimizadas e alterna o foco; clicar no aplicativo ativo o minimiza. Janelas são mantidas na área visível, inclusive ao redimensionar a tela.
 
-Os painéis fecham com Escape ou clique fora. Energia → Encerrar Pixel.OI retorna à apresentação e fecha as janelas. O relógio segue o horário local do navegador. O volume controla os arquivos locais do Música; não altera o volume do computador nem dos players externos. Paciência abre a Spider; Música oferece players e arquivos locais; Notas, Arquivos e Galeria compartilham documentos locais; Configurações contém as preferências da barra. Os demais aplicativos exibem conteúdo temporário.
+Os painéis fecham com Escape ou clique fora. Energia → Encerrar Pixel.OI retorna à apresentação e fecha as janelas. O relógio segue o horário local do navegador. O volume controla os arquivos locais do Música; não altera o volume do computador nem dos players externos. Paciência abre a Spider; Música oferece players e arquivos locais; Notas, Arquivos e Galeria compartilham documentos locais; Configurações contém as preferências da barra. Terminal executa os comandos Pixel e Sobre apresenta o projeto. Assistente IA e Pixel Studio ainda exibem conteúdo temporário.
 
 ## Notas e Arquivos
 
@@ -191,3 +191,22 @@ Os testes `music-links-test.mjs` e `music-browser-test.cjs` cobrem URLs aceitas/
 Esses testes também verificam legendas, reordenação persistente e ações visíveis da Galeria. `test:folders` inclui `bulk-files-browser-test.cjs`, com seleção múltipla, busca, preservação dos bytes e cancelamento atômico em conflitos de nome ou ciclos.
 
 `npm run test:windows` verifica abertura com um clique nos dez apps, fechamento pelos cantos dos controles, Enter/Espaço, toque, salvamento de notas ao fechar e encerramento mesmo quando a limpeza de um app falha. Os testes existentes do desktop e dos apps usam a abertura por clique.
+
+## Terminal e Sobre
+
+O Terminal usa a linguagem Pixel para controlar os aplicativos da interface:
+
+| Comando | Ação |
+| --- | --- |
+| `pixel ajuda` | Mostra os códigos e exemplos. |
+| `pixel abrir <app>` | Abre ou restaura um aplicativo sem duplicar janelas. Exemplo: `pixel abrir musica`. |
+| `pixel listar` | Lista os dez apps e identifica os que ainda estão em desenvolvimento. |
+| `pixel versao` | Mostra a versão pública do projeto. |
+| `pixel limpar` | Limpa a saída do Terminal. |
+| `pixel sobre` | Abre a apresentação do projeto. |
+
+Os comandos aceitam maiúsculas, espaços extras e nomes sem acento; `pixel abrir "Pixel Studio"` também funciona. Enter ou o botão autoral executa. Setas ↑ e ↓ navegam pelo histórico da sessão, preservando o texto ainda não enviado. O histórico guarda até 100 comandos e a saída até 150 entradas; fechar a janela limpa essa sessão. A entrada é tratada como texto e não é executada como JavaScript ou comando do computador.
+
+O Sobre contém Julia, Lais e Geovanna, a ideia do projeto, a inspiração nos desktops antigos e no Windows96, a tabela dos comandos e o link do repositório. O artigo está marcado como **em breve**, sem link provisório. A versão e a lista de comandos são compartilhadas entre os dois apps em `js/project-info.js`; `js/app-catalog.js` centraliza os aplicativos e `js/pixel-language.js` interpreta os comandos.
+
+`npm run test:terminal` verifica interpretação, aliases, entradas inválidas, versão consistente com package.json e a integração no Chromium: ajuda, histórico, abrir/restaurar, foco, limpeza, conteúdo do Sobre, texto seguro e tela pequena. Requer o servidor local na porta 8080.

@@ -48,6 +48,8 @@ export class WindowManager {
       music: { width: 800, height: 620 },
       settings: { width: 560, height: 480 },
       gallery: { width: 940, height: 680 },
+      terminal: { width: 760, height: 520 },
+      about: { width: 820, height: 680 },
       notes: { width: 900, height: 680 },
       files: { width: 880, height: 660 },
     }[app.id] || { width: 560, height: 360 };
