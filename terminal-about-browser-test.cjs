@@ -27,7 +27,7 @@ const assert = require("node:assert/strict");
     await run("pixel listar");
     assert.match(
       await output.textContent(),
-      /Assistente IA — em desenvolvimento/,
+      /Pixel Studio — em desenvolvimento/,
     );
     await run("pixel versao");
     assert.match(await output.textContent(), /versão 0\.1\.0/);
@@ -88,7 +88,7 @@ const assert = require("node:assert/strict");
     await run("pixel abrir assistente ia");
     assert.match(
       await page.locator('.window[data-app="assistant"]').textContent(),
-      /EM DESENVOLVIMENTO/,
+      /PIXEL.OI \/ GUIA/,
     );
     await page
       .getByRole("button", { name: "Fechar Assistente IA", exact: true })

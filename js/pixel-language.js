@@ -40,6 +40,8 @@ export function parsePixel(input) {
     };
   const requested = rest.join(" ").replace(/^(["'])(.*)\1$/, "$2");
   const alias = {
+    guia: "assistant",
+    assistente: "assistant",
     spider: "solitaire",
     paciencia: "solitaire",
     configuracoes: "settings",
@@ -58,4 +60,4 @@ export function parsePixel(input) {
     };
   return { type: "open", id: app.id };
 }
-export const isPendingApp = (app) => ["assistant", "studio"].includes(app.id);
+export const isPendingApp = (app) => app.id === "studio";

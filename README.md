@@ -1,6 +1,6 @@
 # Pixel.OI
 
-Sistema operacional fictício em pixel art, executado inteiramente no navegador. Primeira etapa: apresentação, boot simulado, desktop, menu com dez aplicativos e gerenciador reutilizável de janelas. Agora inclui Paciência Spider com três dificuldades e os aplicativos Música, Notas, Arquivos, Galeria, Terminal e Sobre. Não há servidor de aplicação, autenticação, Supabase ou IA nesta etapa.
+Sistema operacional fictício em pixel art, executado inteiramente no navegador. Primeira etapa: apresentação, boot simulado, desktop, menu com dez aplicativos e gerenciador reutilizável de janelas. Agora inclui Paciência Spider com três dificuldades e os aplicativos Música, Notas, Arquivos, Galeria, Terminal e Sobre. Não há servidor de aplicação, autenticação, Supabase ou IA generativa nesta etapa.
 
 ## Executar localmente
 
@@ -55,7 +55,7 @@ Clique em Iniciar Pixel.OI e aguarde a simulação visual do boot. No desktop, u
 
 Arraste uma janela pela barra de título. Os controles têm área de 44 px, preservando os PNGs originais. Use-os para minimizar, maximizar/restaurar e fechar; duplo clique no título também maximiza/restaura. A barra de tarefas restaura janelas minimizadas e alterna o foco; clicar no aplicativo ativo o minimiza. Janelas são mantidas na área visível, inclusive ao redimensionar a tela.
 
-Os painéis fecham com Escape ou clique fora. Energia → Encerrar Pixel.OI retorna à apresentação e fecha as janelas. O relógio segue o horário local do navegador. O volume controla os arquivos locais do Música; não altera o volume do computador nem dos players externos. Paciência abre a Spider; Música oferece players e arquivos locais; Notas, Arquivos e Galeria compartilham documentos locais; Configurações contém as preferências da barra. Terminal executa os comandos Pixel e Sobre apresenta o projeto. Assistente IA e Pixel Studio ainda exibem conteúdo temporário.
+Os painéis fecham com Escape ou clique fora. Energia → Encerrar Pixel.OI retorna à apresentação e fecha as janelas. O relógio segue o horário local do navegador. O volume controla os arquivos locais do Música; não altera o volume do computador nem dos players externos. Paciência abre a Spider; Música oferece players e arquivos locais; Notas, Arquivos e Galeria compartilham documentos locais; Configurações contém as preferências da barra. Terminal executa os comandos Pixel e Sobre apresenta o projeto. Assistente IA funciona como guia local do Pixel.OI. Somente o Pixel Studio ainda exibe conteúdo temporário.
 
 ## Notas e Arquivos
 
@@ -210,3 +210,16 @@ Os comandos aceitam maiúsculas, espaços extras e nomes sem acento; `pixel abri
 O Sobre contém Julia, Lais e Geovanna, a ideia do projeto, a inspiração nos desktops antigos e no Windows96, a tabela dos comandos e o link do repositório. O artigo está marcado como **em breve**, sem link provisório. A versão e a lista de comandos são compartilhadas entre os dois apps em `js/project-info.js`; `js/app-catalog.js` centraliza os aplicativos e `js/pixel-language.js` interpreta os comandos.
 
 `npm run test:terminal` verifica interpretação, aliases, entradas inválidas, versão consistente com package.json e a integração no Chromium: ajuda, histórico, abrir/restaurar, foco, limpeza, conteúdo do Sobre, texto seguro e tela pequena. Requer o servidor local na porta 8080.
+
+## Guia do Pixel.OI (Assistente IA)
+
+O ícone de Assistente IA (ou `pixel abrir guia` no Terminal) abre um guia específico da interface, com respostas preparadas e busca por assunto. Não usa API, não envia perguntas à rede e não lê notas, arquivos ou conteúdo dos outros aplicativos. O histórico existe apenas na janela atual, com limite de 60 mensagens; **Limpar conversa** reinicia a conversa e fechar o app descarta o histórico.
+
+- Perguntas sugeridas para começar e respostas sobre Notas, Arquivos, Galeria, Música, Spider, Configurações, Terminal, janelas e o projeto.
+- Dúvidas comuns: onde ficam os documentos, exportar notas, importar/excluir imagens, criar pastas, áudio, barra de tarefas e comandos Pixel.
+- Apresentação de Julia, Lais e Geovanna, inspiração, versão e artigo ainda pendente.
+- Atalhos nas respostas abrem ou restauram os aplicativos apenas quando clicados, sem duplicar janelas.
+- **Dicas** usa somente o identificador do último app usado, inclusive quando minimizado; é atualizado ao trocar de app e limpo ao encerrar o sistema. Não inspeciona documentos. O guia remove seu listener ao fechar.
+- Assuntos desconhecidos recebem uma explicação dos limites e perguntas alternativas. Pixel Studio é informado como pendente; o guia não afirma converter músicas externas nem recuperar dados apagados.
+
+`js/guide-knowledge.js` contém o conteúdo e a busca por assunto, e `js/guide.js` monta a conversa com texto seguro. `npm run test:guide` verifica perguntas, contexto, limites, atalhos, texto seguro, ausência de requisições de dados, limpeza da sessão e layout no celular. O teste usa o servidor local; `PIXEL_URL` permite escolher outra porta.

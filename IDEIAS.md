@@ -37,4 +37,10 @@
 - Linguagem Pixel: ajuda, abrir apps, listar, versão, limpar e sobre; histórico com as setas.
 - Sobre com Julia, Lais e Geovanna, proposta, inspiração em desktops antigos/Windows96 e lista de códigos.
 - Artigo do projeto aguardando o link definitivo.
-- Assistente IA fica para uma próxima etapa; Pixel Studio permanece por último.
+- Assistente IA implementado como guia local; Pixel Studio permanece por último.
+
+## Guia do Pixel.OI — implementado
+
+- Assistente com respostas preparadas sobre apps/projeto, sugestões e atalhos.
+- Dicas do último app usado, sem ler documentos e sem API.
+- Pixel Studio é o único aplicativo ainda por desenvolver.

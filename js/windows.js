@@ -49,6 +49,7 @@ export class WindowManager {
       settings: { width: 560, height: 480 },
       gallery: { width: 940, height: 680 },
       terminal: { width: 760, height: 520 },
+      assistant: { width: 800, height: 680 },
       about: { width: 820, height: 680 },
       notes: { width: 900, height: 680 },
       files: { width: 880, height: 660 },
@@ -88,7 +89,13 @@ export class WindowManager {
   focus(id, moveFocus = true) {
     const state = this.windows.get(id);
     if (!state || state.minimized) return;
+    const changed = this.activeId !== id;
     this.activeId = id;
+    if (id !== "assistant") this.workspace.dataset.guideContext = id;
+    if (changed)
+      this.workspace.dispatchEvent(
+        new CustomEvent("pixel:app-focus", { bubbles: true, detail: { id } }),
+      );
     state.order = ++this.order;
     // Recompactar mantém todas as janelas abaixo dos menus e da barra.
     const ordered = [...this.windows.values()].sort(
@@ -178,6 +185,7 @@ export class WindowManager {
       this.release(state);
     }
     this.windows.clear();
+    delete this.workspace.dataset.guideContext;
     this.activeId = null;
     this.order = 0;
     this.onChange();
