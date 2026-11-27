@@ -180,7 +180,7 @@ export function getGuideAnswer(question, contextId = null) {
       return answer(
         "game-save",
         "Sua partida",
-        "A Spider mantém a partida na memória desta sessão. Fechar e reabrir Paciência permite continuar; recarregar ou sair da página perde o progresso. Ainda não há salvamento permanente da partida.",
+        "A Spider salva automaticamente a partida neste navegador, inclusive até 100 jogadas para desfazer. Espere a mensagem Partida salva neste navegador antes de sair. Ao voltar, abra Paciência e escolha Continuar partida. Se houver erro, use Salvar partida; enquanto não salvar, não recarregue. Limpar os dados do site ou trocar de navegador não leva a partida junto.",
         ["solitaire"],
       );
     return answer(

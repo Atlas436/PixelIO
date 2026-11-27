@@ -340,6 +340,7 @@
 
 .spider-host {
   display: flex;
+  flex-direction: column;
   flex: 1;
   min-height: 0;
   min-width: 0;
@@ -516,3 +517,5 @@
   box-shadow: 5px 8px 10px #0006;
   cursor: grabbing;
 }
+.spider-view {display:flex;flex:1;min-height:0;min-width:0;}
+.spider-save-status {margin:0;padding:8px 16px;border-top:1px solid var(--line);font-size:10px;color:var(--muted);line-height:1.5;flex-shrink:0;}
