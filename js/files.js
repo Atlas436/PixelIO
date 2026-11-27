@@ -1,3 +1,4 @@
+import { isImage } from "./images.js";
 import { iconButton, pixelArt } from "./assets.js";
 import {
   listFiles,
@@ -331,12 +332,7 @@ export function createFiles() {
         )
       ) {
         selectedId = null;
-        clearPreview();
-        details.replaceChildren();
-        const text = document.createElement("p");
-        text.className = "document-empty";
-        text.textContent = "Selecione um arquivo ou pasta para abrir.";
-        details.append(text);
+        clearDetails();
       }
     } catch (error) {
       report(error);
@@ -538,7 +534,7 @@ export function createFiles() {
       });
       edit.append(document.createTextNode("Abrir cópia no Notas"));
       actions.prepend(edit);
-    } else if (/^image\/(png|jpeg|gif|webp|bmp|avif)$/.test(file.type)) {
+    } else if (isImage(file)) {
       imageURL = URL.createObjectURL(file.blob);
       const image = document.createElement("img");
       image.className = "file-preview-image";

@@ -2,7 +2,6 @@ import { resizeRect, snapRect, minWindowWidth } from "./window-geometry.js";
 import { iconButton } from "./assets.js";
 import { appContent } from "./apps.js";
 
-// Uma janela por aplicativo. O Map mantém a relação entre estado e elemento.
 export class WindowManager {
   constructor(workspace, layer, onChange) {
     this.workspace = workspace;

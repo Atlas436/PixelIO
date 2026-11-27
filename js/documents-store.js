@@ -1,4 +1,3 @@
-// Dados locais compartilhados pelos apps Notas e Arquivos. Nenhum arquivo é enviado.
 import {
   parentOf,
   isFolder,
@@ -73,7 +72,6 @@ async function operation(store, mode, action) {
               : "Não foi possível salvar a alteração neste navegador.",
           ),
         );
-      transaction.onerror = () => {}; // O resultado da transação é tratado em onabort.
     } catch {
       reject(
         new Error("O armazenamento local está indisponível. Tente novamente."),
@@ -137,7 +135,6 @@ async function changeFiles(action) {
               : "Não foi possível alterar os arquivos neste navegador.",
           ),
       );
-    transaction.onerror = () => {};
   });
   emit("files", result?.id);
   return result;

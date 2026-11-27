@@ -1,4 +1,3 @@
-// Regras independentes da interface: Spider de 1, 2 ou 4 naipes, 104 cartas.
 export const suits = {
   spades: { name: "espadas", symbol: "♠", red: false },
   hearts: { name: "copas", symbol: "♥", red: true },
@@ -10,19 +9,16 @@ export const difficulties = [
     count: 1,
     name: "Fácil",
     description: "Um naipe para começar.",
-    symbols: "♠",
   },
   {
     count: 2,
     name: "Médio",
     description: "Dois naipes, novas escolhas.",
-    symbols: "♠ ♥",
   },
   {
     count: 4,
     name: "Difícil",
     description: "Quatro naipes. O desafio completo.",
-    symbols: "♠ ♥ ♦ ♣",
   },
 ];
 export const rankName = (rank) =>

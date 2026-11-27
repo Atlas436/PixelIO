@@ -1,6 +1,5 @@
 import { iconButton, pixelArt } from "./assets.js";
 
-// Um único ponto de controle para mini player e Media Session do navegador.
 export function createMediaControls(app) {
   let state = null;
   let disposed = false;

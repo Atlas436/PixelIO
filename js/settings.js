@@ -27,7 +27,6 @@ export function setAutoHide(value) {
   for (const listener of listeners) listener(autoHide);
   return saved;
 }
-// Mantém abas abertas do mesmo site de acordo com a última preferência salva.
 window.addEventListener("storage", (event) => {
   if (event.key !== key && event.key !== null) return;
   try {
@@ -57,7 +56,6 @@ export function createSettings() {
       ? "Preferência salva neste navegador."
       : "Preferência aplicada nesta sessão. O navegador não permitiu salvá-la.";
   });
-  // Atualiza ao voltar à janela, sem registrar listeners em janelas já fechadas.
   content.addEventListener("focusin", () => {
     input.checked = getAutoHide();
   });

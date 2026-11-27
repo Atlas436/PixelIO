@@ -122,6 +122,7 @@
   overflow-wrap: anywhere;
 }
 .notes-workspace {
+  position: relative;
   min-width: 0;
   min-height: 0;
 }
@@ -547,9 +548,12 @@
   margin-bottom: 8px;
 }
 .gallery-preview {
-  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0;
+  min-height: 0;
   border-left: 1px solid var(--line);
-  padding: 20px;
   min-width: 0;
   overflow-wrap: anywhere;
   font-size: 12px;
@@ -558,9 +562,6 @@
   width: 100%;
   max-height: 340px;
   object-fit: contain;
-}
-.gallery-preview .document-toolbar {
-  padding: 10px 0;
 }
 .note-images {
   flex: none;
@@ -594,9 +595,6 @@
   font: inherit;
   font-size: 10px;
 }
-.notes-workspace {
-  position: relative;
-}
 .note-image-picker {
   position: absolute;
   inset: 0;
@@ -622,7 +620,6 @@
   .gallery-preview {
     border-left: 0;
     border-top: 1px solid var(--line);
-    padding: 12px;
   }
   .gallery-grid {
     padding: 10px;
@@ -646,13 +643,6 @@
   }
 }
 
-.gallery-preview {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  padding: 0;
-  min-height: 0;
-}
 .gallery-preview-content {
   flex: 1;
   min-height: 0;

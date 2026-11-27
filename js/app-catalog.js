@@ -1,4 +1,3 @@
-// Catálogo compartilhado pelo desktop, menu, janelas e linguagem Pixel.
 export const apps = [
   { id: "files", name: "Arquivos", initials: "AR" },
   { id: "music", name: "Música", initials: "MU" },

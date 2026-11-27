@@ -34,6 +34,10 @@ test("guia explica tarefas sem inventar funcionalidades", () => {
   ];
   for (const [q, id] of cases) assert.equal(getGuideAnswer(q).id, id, q);
   assert.match(
+    getGuideAnswer("Como salvo minha partida?").text,
+    /recarregar ou sair da página perde o progresso/,
+  );
+  assert.match(
     getGuideAnswer("Quem criou o projeto?").text,
     /Julia, Lais, Geovanna/,
   );
