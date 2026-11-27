@@ -19,7 +19,6 @@ export function setupDesktop(open) {
     name.className = "app-name";
     name.textContent = app.name;
     button.append(placeholder(app), name);
-    // O click nativo atende mouse, toque, Enter e Espaço sem abrir duas vezes.
     button.addEventListener("click", () => {
       select(button);
       open(app);

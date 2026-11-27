@@ -1,4 +1,3 @@
-// Avisos internos do Pixel.OI: não usam permissões de notificações do computador.
 const entries = [];
 const listeners = new Set();
 let nextId = 0;

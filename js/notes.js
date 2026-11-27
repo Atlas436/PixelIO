@@ -189,18 +189,7 @@ export function createNotes() {
     pickerUrls.clear();
   }
   function attachImages(id, images) {
-    const previous = records.get(id);
-    if (!previous || disposed) return;
-    const note = {
-      ...previous,
-      images: [...(previous.images || []), ...images],
-      updatedAt: Date.now(),
-    };
-    records.set(id, note);
-    drafts.set(id, { note, revision: ++revision });
-    if (activeId === id) renderImages();
-    renderList();
-    flush(id).catch(() => {});
+    updateImages(id, (previous) => [...previous, ...images]);
   }
   function updateImages(id, transform, redraw = true) {
     const previous = records.get(id);
@@ -301,17 +290,9 @@ export function createNotes() {
             disposed
           )
             return;
-          const previous = records.get(id);
-          if (!previous) return;
-          const updated = {
-            ...previous,
-            images: (previous.images || []).filter((i) => i.id !== image.id),
-            updatedAt: Date.now(),
-          };
-          records.set(id, updated);
-          drafts.set(id, { note: updated, revision: ++revision });
-          if (activeId === id) renderImages();
-          flush(id).catch(() => {});
+          updateImages(id, (images) =>
+            images.filter((item) => item.id !== image.id),
+          );
         },
       );
       remove.append(document.createTextNode("Remover imagem"));

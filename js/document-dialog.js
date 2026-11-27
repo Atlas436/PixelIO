@@ -1,4 +1,3 @@
-// Confirmações restritas à janela do aplicativo, sem bloquear o resto do desktop.
 export function createDocumentDialog(root, shell) {
   let active;
   function cancel() {

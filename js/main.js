@@ -9,7 +9,6 @@ const boot = document.querySelector("#boot");
 const system = document.querySelector("#system");
 const start = document.querySelector("#start");
 let taskbar;
-let clearSelection;
 let bootTimer;
 const manager = new WindowManager(
   document.querySelector("#workspace"),
@@ -18,24 +17,18 @@ const manager = new WindowManager(
 );
 
 decorateButton(start, "iniciar");
-clearSelection = setupDesktop((app) => manager.open(app));
+const clearSelection = setupDesktop((app) => manager.open(app));
 taskbar = setupTaskbar(manager, shutdown);
 
-document
-  .querySelector("#system")
-  .addEventListener("pixel:restore-music", () => manager.restore("music"));
+system.addEventListener("pixel:restore-music", () => manager.restore("music"));
 
-document
-  .querySelector("#system")
-  .addEventListener("pixel:open-files", () =>
-    manager.open(apps.find((app) => app.id === "files")),
-  );
-document
-  .querySelector("#system")
-  .addEventListener("pixel:open-note", (event) => {
-    manager.open(apps.find((app) => app.id === "notes"));
-    document.querySelector(".notes-app")?.openNote(event.detail.id);
-  });
+system.addEventListener("pixel:open-files", () =>
+  manager.open(apps.find((app) => app.id === "files")),
+);
+system.addEventListener("pixel:open-note", (event) => {
+  manager.open(apps.find((app) => app.id === "notes"));
+  document.querySelector(".notes-app")?.openNote(event.detail.id);
+});
 
 system.addEventListener("pixel:open-app", (event) => {
   const app = apps.find((app) => app.id === event.detail?.id);

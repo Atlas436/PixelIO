@@ -1,4 +1,3 @@
-// SDKs oficiais, carregados somente quando o usuário abre um link do serviço.
 let youtubePromise;
 let spotifyPromise;
 function loadSDK(url, callback, read) {

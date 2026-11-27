@@ -82,6 +82,15 @@ export function guideForApp(id) {
     info[2],
   ]);
 }
+function introduction() {
+  return answer(
+    "intro",
+    "Explore o Pixel.OI",
+    "Você pode escrever no Notas, organizar documentos em Arquivos, ver imagens na Galeria, ouvir música, jogar Spider e abrir apps pelo Terminal. Escolha uma sugestão ou um atalho para começar.",
+    ["notes", "files", "gallery", "music", "solitaire", "terminal"],
+    welcomeQuestions,
+  );
+}
 export function getGuideAnswer(question, contextId = null) {
   const q = normalize(question);
   if (!q)
@@ -171,7 +180,7 @@ export function getGuideAnswer(question, contextId = null) {
       return answer(
         "game-save",
         "Sua partida",
-        "A Spider preserva a sessão neste navegador quando o armazenamento está disponível. Reabra Paciência para retomar. Limpar os dados do site pode apagar a partida.",
+        "A Spider mantém a partida na memória desta sessão. Fechar e reabrir Paciência permite continuar; recarregar ou sair da página perde o progresso. Ainda não há salvamento permanente da partida.",
         ["solitaire"],
       );
     return answer(
@@ -255,14 +264,7 @@ export function getGuideAnswer(question, contextId = null) {
   if (/\b(arquivo|arquivos)\b/.test(q)) return guideForApp("files");
   if (/\b(guia|assistente|ia|voce|privacidade)\b/.test(q))
     return guideForApp("assistant");
-  if (/^o que.*fazer/.test(q))
-    return answer(
-      "intro",
-      "Explore o Pixel.OI",
-      "Você pode escrever no Notas, organizar documentos em Arquivos, ver imagens na Galeria, ouvir música, jogar Spider e abrir apps pelo Terminal. Escolha um atalho para começar.",
-      ["notes", "files", "gallery", "music", "solitaire", "terminal"],
-      welcomeQuestions,
-    );
+  if (/^o que.*fazer/.test(q)) return introduction();
   if (
     /\b(isso|aqui|dica|dicas|ajuda|ajude|ajudar)\b/.test(q) &&
     contextId &&
@@ -271,13 +273,7 @@ export function getGuideAnswer(question, contextId = null) {
   )
     return guideForApp(contextId);
   if (/\b(oi|ola|comecar|inicio|fazer|funciona|interface)\b/.test(q))
-    return answer(
-      "intro",
-      "Explore o Pixel.OI",
-      "Você pode escrever no Notas, organizar documentos em Arquivos, ver imagens na Galeria, ouvir música, jogar Spider e abrir apps pelo Terminal. Escolha uma sugestão ou um atalho para começar.",
-      ["notes", "files", "gallery", "music", "solitaire", "terminal"],
-      welcomeQuestions,
-    );
+    return introduction();
   return answer(
     "unknown",
     "Vamos procurar por assunto",

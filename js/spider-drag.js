@@ -1,4 +1,3 @@
-// Arraste por ponteiro: mouse, caneta e toque usam as próprias cartas da mesa.
 export function setupSpiderDrag(root, { canMove, onDrop, onInvalid }) {
   let active = null;
   let ghost = null;

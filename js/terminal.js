@@ -105,7 +105,6 @@ export function createTerminal() {
     input.value = cursor === history.length ? draft : history[cursor];
     input.setSelectionRange(input.value.length, input.value.length);
   });
-  // Não disputar o foco com outras janelas se o Terminal já tiver sido fechado.
   let disposed = false;
   queueMicrotask(() => {
     if (!disposed && root.isConnected) input.focus();

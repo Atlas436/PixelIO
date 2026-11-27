@@ -314,7 +314,6 @@ function createTable(onHome) {
   return root;
 }
 
-// A abertura do aplicativo sempre mostra o início, sem perder a partida da sessão.
 export function createSpider() {
   const host = document.createElement("div");
   host.className = "spider-host";

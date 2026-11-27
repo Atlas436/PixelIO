@@ -242,3 +242,7 @@ Cada encaixe ocupa metade da área útil acima da barra. Use o atalho em cada um
 O menu desativa o encaixe com área menor que 640 px. Uma janela que já estava encaixada ocupa a área inteira ao reduzir a tela e volta à metade ao ampliá-la. Os apps adaptam seus painéis à largura da própria janela. O conteúdo, a posição de reprodução e as edições são preservados, pois a janela não é recriada.
 
 `npm run test:layout` cobre geometria, limites, metades sem lacunas, redimensionamento por cantos, atalhos, duas janelas, restauração de tamanho, conteúdo preservado, menu, minimizar/restaurar, mudança de viewport e toque.
+
+## Verificação do código
+
+`npm run check` usa `check-js.mjs` para verificar a sintaxe de todos os módulos em `js/`, incluindo arquivos novos automaticamente. `npm test` executa as verificações de regras e integração dos aplicativos. O servidor estático deve estar aberto; use `PIXEL_URL` para testar em outra porta.
