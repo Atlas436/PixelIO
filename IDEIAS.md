@@ -44,3 +44,8 @@
 - Assistente com respostas preparadas sobre apps/projeto, sugestões e atalhos.
 - Dicas do último app usado, sem ler documentos e sem API.
 - Pixel Studio é o único aplicativo ainda por desenvolver.
+
+## Janelas ajustáveis — implementado
+
+- Redimensionar pelas bordas/cantos, menu Organizar e encaixe lado a lado.
+- Atalhos Alt + Shift + setas, preservação do tamanho livre e adaptação a telas estreitas.

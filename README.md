@@ -223,3 +223,22 @@ O ícone de Assistente IA (ou `pixel abrir guia` no Terminal) abre um guia espec
 - Assuntos desconhecidos recebem uma explicação dos limites e perguntas alternativas. Pixel Studio é informado como pendente; o guia não afirma converter músicas externas nem recuperar dados apagados.
 
 `js/guide-knowledge.js` contém o conteúdo e a busca por assunto, e `js/guide.js` monta a conversa com texto seguro. `npm run test:guide` verifica perguntas, contexto, limites, atalhos, texto seguro, ausência de requisições de dados, limpeza da sessão e layout no celular. O teste usa o servidor local; `PIXEL_URL` permite escolher outra porta.
+
+## Tamanho e encaixe das janelas
+
+Arraste qualquer borda ou canto para ajustar largura e altura. O tamanho mínimo é 320 × 240 px, limitado à área disponível. O menu **Organizar** no topo da janela reutiliza o PNG autoral de menu e oferece encaixe à esquerda/direita, maximizar e restaurar o tamanho livre.
+
+| Atalho | Ação na janela ativa |
+| --- | --- |
+| Alt + Shift + ← | Encaixar à esquerda |
+| Alt + Shift + → | Encaixar à direita |
+| Alt + Shift + ↑ | Maximizar |
+| Alt + Shift + ↓ | Voltar ao tamanho livre |
+
+Win + setas também é aceito quando o sistema repassa o evento ao navegador, exceto em plataformas Apple, onde esse modificador já é usado para editar texto. O Windows pode reservar esses atalhos; use Alt + Shift + setas ou o menu nesses casos. Setas sem modificadores continuam editando texto e operando os apps normalmente.
+
+Cada encaixe ocupa metade da área útil acima da barra. Use o atalho em cada um dos dois apps para deixá-los lado a lado. O tamanho livre anterior é preservado ao encaixar ou maximizar. Maximizar uma janela encaixada e usar o botão Restaurar retorna ao encaixe; **Restaurar tamanho** ou Alt + Shift + ↓ retorna ao tamanho livre. Arrastar uma janela encaixada pelo título também a solta.
+
+O menu desativa o encaixe com área menor que 640 px. Uma janela que já estava encaixada ocupa a área inteira ao reduzir a tela e volta à metade ao ampliá-la. Os apps adaptam seus painéis à largura da própria janela. O conteúdo, a posição de reprodução e as edições são preservados, pois a janela não é recriada.
+
+`npm run test:layout` cobre geometria, limites, metades sem lacunas, redimensionamento por cantos, atalhos, duas janelas, restauração de tamanho, conteúdo preservado, menu, minimizar/restaurar, mudança de viewport e toque.

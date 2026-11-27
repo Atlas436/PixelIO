@@ -1,3 +1,4 @@
+import { resizeRect, snapRect, minWindowWidth } from "./window-geometry.js";
 import { iconButton } from "./assets.js";
 import { appContent } from "./apps.js";
 
@@ -11,6 +12,15 @@ export class WindowManager {
     this.activeId = null;
     this.order = 0;
     window.addEventListener("resize", () => this.fitAll());
+    document.addEventListener("keydown", (event) => this.handleKey(event));
+    document.addEventListener("pointerdown", (event) => {
+      if (!event.target.closest(".window-layout-menu, .window-layout-toggle"))
+        this.closeMenus();
+    });
+    this.announcement = document.createElement("p");
+    this.announcement.className = "sr-only";
+    this.announcement.setAttribute("role", "status");
+    this.workspace.append(this.announcement);
   }
 
   open(app) {
@@ -32,7 +42,47 @@ export class WindowManager {
     const maximize = iconButton("maximizar", `Maximizar ${app.name}`, () =>
       this.maximize(app.id),
     );
+    const layoutButton = iconButton("menu", `Organizar ${app.name}`, () => {
+      const show = menu.hidden;
+      this.closeMenus();
+      menu.hidden = !show;
+      layoutButton.setAttribute("aria-expanded", String(show));
+      if (show) menu.querySelector("button:not(:disabled)")?.focus();
+    });
+    layoutButton.classList.add("window-layout-toggle");
+    layoutButton.setAttribute("aria-expanded", "false");
+    const menu = document.createElement("div");
+    menu.className = "window-layout-menu";
+    menu.hidden = true;
+    menu.setAttribute("role", "group");
+    menu.setAttribute("aria-label", `Organizar janela ${app.name}`);
+    for (const [label, handler] of [
+      ["Encaixar à esquerda", () => this.snap(app.id, "left")],
+      ["Encaixar à direita", () => this.snap(app.id, "right")],
+      [
+        "Maximizar janela",
+        () => {
+          if (!state.maximized) this.maximize(app.id);
+        },
+      ],
+      ["Restaurar tamanho", () => this.unsnap(app.id)],
+    ]) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = label;
+      if (label.startsWith("Encaixar")) button.dataset.snap = "true";
+      button.addEventListener("click", () => {
+        this.closeMenus();
+        handler();
+      });
+      menu.append(button);
+    }
+    const hint = document.createElement("p");
+    hint.textContent =
+      "Alt + Shift + ← / → encaixa · ↑ maximiza · ↓ restaura. Arraste as bordas para ajustar.";
+    menu.append(hint);
     controls.append(
+      layoutButton,
       iconButton("minimizar", `Minimizar ${app.name}`, () =>
         this.minimize(app.id),
       ),
@@ -41,7 +91,7 @@ export class WindowManager {
     );
     titlebar.append(title, controls);
     const content = appContent(app);
-    element.append(titlebar, content);
+    element.append(titlebar, content, menu);
     const offset = (this.windows.size % 6) * 28;
     const preferred = {
       solitaire: { width: 1040, height: 650 },
@@ -58,6 +108,10 @@ export class WindowManager {
       app,
       element,
       maximize,
+      menu,
+      layoutButton,
+      snap: null,
+      beforeMaxSnap: null,
       minimized: false,
       maximized: false,
       x: app.id === "solitaire" ? 40 : 160 + offset,
@@ -83,6 +137,7 @@ export class WindowManager {
       if (!event.target.closest("button")) this.maximize(app.id);
     });
     this.enableDrag(state, titlebar);
+    this.enableResize(state);
     this.focus(app.id);
   }
 
@@ -124,6 +179,7 @@ export class WindowManager {
   minimize(id) {
     const state = this.windows.get(id);
     if (!state) return;
+    this.closeMenus();
     state.minimized = true;
     state.element.hidden = true;
     state.element.classList.remove("active");
@@ -146,16 +202,94 @@ export class WindowManager {
     else this.restore(id);
   }
 
+  closeMenus() {
+    for (const state of this.windows.values()) {
+      state.menu.hidden = true;
+      state.layoutButton.setAttribute("aria-expanded", "false");
+    }
+  }
+
+  handleKey(event) {
+    if (event.key === "Escape") {
+      const open = [...this.windows.values()].find(
+        (state) => !state.menu.hidden,
+      );
+      if (open) {
+        event.preventDefault();
+        this.closeMenus();
+        open.layoutButton.focus();
+      }
+      return;
+    }
+    const fallback =
+      event.altKey && event.shiftKey && !event.ctrlKey && !event.metaKey;
+    const windowsKey =
+      event.metaKey &&
+      !event.ctrlKey &&
+      !event.altKey &&
+      !event.shiftKey &&
+      !/Mac|iPhone|iPad/.test(navigator.platform);
+    if (
+      (!fallback && !windowsKey) ||
+      !["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(event.key)
+    )
+      return;
+    const state = this.windows.get(this.activeId);
+    if (!state || state.minimized) return;
+    event.preventDefault();
+    const previous = document.activeElement;
+    this.closeMenus();
+    if (event.key === "ArrowLeft" || event.key === "ArrowRight")
+      this.snap(state.app.id, event.key === "ArrowLeft" ? "left" : "right");
+    if (event.key === "ArrowUp" && !state.maximized)
+      this.maximize(state.app.id);
+    if (event.key === "ArrowDown") this.unsnap(state.app.id);
+    if (
+      state.element.contains(previous) &&
+      !previous.closest(".window-layout-menu")
+    )
+      previous.focus({ preventScroll: true });
+  }
+
+  snap(id, side) {
+    const state = this.windows.get(id);
+    if (!state) return;
+    if (this.workspace.clientWidth < minWindowWidth * 2) {
+      this.announcement.textContent =
+        "Para usar janelas lado a lado, amplie a tela para pelo menos 640 pixels.";
+      return;
+    }
+    state.maximized = false;
+    state.snap = side;
+    state.beforeMaxSnap = null;
+    this.fit(state);
+    this.focus(id);
+    this.announcement.textContent = `${state.app.name} encaixado à ${side === "left" ? "esquerda" : "direita"}.`;
+  }
+
+  unsnap(id) {
+    const state = this.windows.get(id);
+    if (!state) return;
+    state.maximized = false;
+    state.snap = null;
+    state.beforeMaxSnap = null;
+    this.fit(state);
+    this.focus(id);
+    this.announcement.textContent = `Tamanho livre de ${state.app.name} restaurado.`;
+  }
+
   maximize(id) {
     const state = this.windows.get(id);
     if (!state) return;
-    state.maximized = !state.maximized;
-    state.element.classList.toggle("maximized", state.maximized);
-    const label = `${state.maximized ? "Restaurar" : "Maximizar"} ${state.app.name}`;
-    state.maximize.setAttribute("aria-label", label);
-    state.maximize.title = label;
-    state.maximize.setAttribute("aria-pressed", String(state.maximized));
-    // O mesmo PNG autoral é reutilizado para restaurar; não há arte inventada.
+    if (state.maximized) {
+      state.maximized = false;
+      state.snap = state.beforeMaxSnap;
+      state.beforeMaxSnap = null;
+    } else {
+      state.beforeMaxSnap = state.snap;
+      state.maximized = true;
+      state.snap = null;
+    }
     this.fit(state);
     this.focus(id);
   }
@@ -192,22 +326,94 @@ export class WindowManager {
   }
 
   fit(state) {
-    if (state.maximized) return;
-    const { clientWidth: width, clientHeight: height } = this.workspace;
-    const w = Math.min(state.width, width);
-    const h = Math.min(state.height, height);
-    state.x = Math.max(0, Math.min(state.x, width - w));
-    state.y = Math.max(0, Math.min(state.y, height - h));
+    const area = {
+      width: this.workspace.clientWidth,
+      height: this.workspace.clientHeight,
+    };
+    // Em telas estreitas, conserve o encaixe para quando a tela voltar a crescer.
+    const narrow = area.width < minWindowWidth * 2;
+    let rect;
+    if (state.maximized || (state.snap && narrow))
+      rect = { x: 0, y: 0, ...area };
+    else if (state.snap) rect = snapRect(state.snap, area);
+    else {
+      const width = Math.min(state.width, area.width),
+        height = Math.min(state.height, area.height);
+      state.x = Math.max(0, Math.min(state.x, area.width - width));
+      state.y = Math.max(0, Math.min(state.y, area.height - height));
+      rect = { x: state.x, y: state.y, width, height };
+    }
+    state.element.classList.toggle("maximized", state.maximized);
+    state.element.classList.toggle("snapped", !!state.snap);
+    state.element.dataset.layout = state.maximized
+      ? "maximized"
+      : state.snap || "free";
+    const label = `${state.maximized ? "Restaurar" : "Maximizar"} ${state.app.name}`;
+    state.maximize.setAttribute("aria-label", label);
+    state.maximize.title = label;
+    state.maximize.setAttribute("aria-pressed", String(state.maximized));
+    for (const button of state.menu.querySelectorAll("[data-snap]"))
+      button.disabled = narrow;
     Object.assign(state.element.style, {
-      left: `${state.x}px`,
-      top: `${state.y}px`,
-      width: `${w}px`,
-      height: `${h}px`,
+      left: `${rect.x}px`,
+      top: `${rect.y}px`,
+      width: `${rect.width}px`,
+      height: `${rect.height}px`,
     });
   }
 
   fitAll() {
     for (const state of this.windows.values()) this.fit(state);
+  }
+
+  enableResize(state) {
+    for (const direction of ["n", "s", "e", "w", "ne", "nw", "se", "sw"]) {
+      const handle = document.createElement("div");
+      handle.className = `window-resize window-resize-${direction}`;
+      handle.dataset.resize = direction;
+      handle.setAttribute("aria-hidden", "true");
+      state.element.append(handle);
+      let start = null;
+      handle.addEventListener("pointerdown", (event) => {
+        if (event.button !== 0 || state.maximized || state.snap) return;
+        const box = state.element.getBoundingClientRect(),
+          area = this.workspace.getBoundingClientRect();
+        start = {
+          pointer: event.pointerId,
+          clientX: event.clientX,
+          clientY: event.clientY,
+          x: box.left - area.left,
+          y: box.top - area.top,
+          width: box.width,
+          height: box.height,
+        };
+        handle.setPointerCapture(event.pointerId);
+        state.element.classList.add("resizing");
+        event.preventDefault();
+        event.stopPropagation();
+        this.focus(state.app.id);
+      });
+      handle.addEventListener("pointermove", (event) => {
+        if (!start || start.pointer !== event.pointerId) return;
+        const rect = resizeRect(
+          start,
+          direction,
+          event.clientX - start.clientX,
+          event.clientY - start.clientY,
+          {
+            width: this.workspace.clientWidth,
+            height: this.workspace.clientHeight,
+          },
+        );
+        Object.assign(state, rect);
+        this.fit(state);
+      });
+      for (const name of ["pointerup", "pointercancel", "lostpointercapture"])
+        handle.addEventListener(name, () => {
+          start = null;
+          state.element.classList.remove("resizing");
+        });
+    }
   }
 
   enableDrag(state, titlebar) {
@@ -219,18 +425,37 @@ export class WindowManager {
         state.maximized
       )
         return;
+      const box = state.element.getBoundingClientRect();
       drag = {
         pointer: event.pointerId,
         x: event.clientX,
         y: event.clientY,
         left: state.x,
         top: state.y,
+        snapped: !!state.snap,
+        fraction: (event.clientX - box.left) / box.width,
+        screenTop: box.top,
       };
       titlebar.setPointerCapture(event.pointerId);
       event.preventDefault();
     });
     titlebar.addEventListener("pointermove", (event) => {
       if (!drag || drag.pointer !== event.pointerId) return;
+      if (drag.snapped) {
+        if (Math.hypot(event.clientX - drag.x, event.clientY - drag.y) < 4)
+          return;
+        const area = this.workspace.getBoundingClientRect();
+        state.snap = null;
+        state.x =
+          drag.x -
+          area.left -
+          Math.min(state.width, area.width) * drag.fraction;
+        state.y = drag.screenTop - area.top;
+        this.fit(state);
+        drag.left = state.x;
+        drag.top = state.y;
+        drag.snapped = false;
+      }
       state.x = drag.left + event.clientX - drag.x;
       state.y = drag.top + event.clientY - drag.y;
       this.fit(state);
