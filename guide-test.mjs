@@ -28,6 +28,8 @@ test("guia explica tarefas sem inventar funcionalidades", () => {
     ["Você é uma IA?", "app-assistant"],
     ["Qual é a versão?", "version"],
     ["Como fechar uma janela?", "windows"],
+    ["Como redimensionar?", "windows"],
+    ["Como mover uma janela?", "windows"],
     ["pixel abrir musica", "open"],
   ];
   for (const [q, id] of cases) assert.equal(getGuideAnswer(q).id, id, q);

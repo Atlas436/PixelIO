@@ -207,9 +207,16 @@ export function getGuideAnswer(question, contextId = null) {
       "Na Galeria, selecione uma miniatura e use Excluir imagem no painel da imagem. Confirme a exclusão. Isso remove o original também de Arquivos; as cópias já inseridas nas notas continuam salvas.",
       ["gallery"],
     );
-  if (/\b(pasta|pastas|mover|selecionar|renomear)\b/.test(q))
+  if (
+    /\b(pasta|pastas|mover|selecionar|renomear)\b/.test(q) &&
+    !/\b(janela|janelas)\b/.test(q)
+  )
     return guideForApp("files");
-  if (/\b(fechar|minimizar|maximizar|janela|janelas|abrir|abre)\b/.test(q)) {
+  if (
+    /\b(fechar|minimizar|maximizar|janela|janelas|abrir|abre|redimensionar|encaixar)\b/.test(
+      q,
+    )
+  ) {
     const requested = apps.find((app) => q.includes(normalize(app.name)));
     if (requested && /\b(abrir|abre)\b/.test(q))
       return answer(
@@ -221,7 +228,7 @@ export function getGuideAnswer(question, contextId = null) {
     return answer(
       "windows",
       "Usar as janelas",
-      "Um clique ou toque no ícone abre o app. No topo da janela, use os botões de minimizar, maximizar/restaurar e fechar. A barra de tarefas restaura apps minimizados. Você também pode arrastar a janela pelo título.",
+      "Um clique ou toque no ícone abre o app. Arraste o título para mover e as bordas ou cantos para ajustar o tamanho. O botão Organizar, no topo, oferece encaixe à esquerda/direita e Restaurar tamanho. Atalhos: Alt + Shift + ←/→ encaixa, ↑ maximiza e ↓ volta ao tamanho livre. O encaixe lado a lado requer uma área de pelo menos 640 px; em telas estreitas, a janela encaixada ocupa a área toda. Minimizar guarda a janela na barra de tarefas; fechar encerra o app.",
       [],
       ["Como mostro a barra de tarefas?"],
     );
