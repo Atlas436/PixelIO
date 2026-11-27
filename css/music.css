@@ -1,0 +1,330 @@
+.music-app {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: #191427;
+}
+.music-heading {
+  padding: 22px 24px 18px;
+}
+.music-heading .eyebrow {
+  font-size: 9px;
+  letter-spacing: 2px;
+  margin-bottom: 10px;
+}
+.music-heading h3 {
+  font-size: 26px;
+  margin: 0 0 10px;
+}
+.music-heading > p:last-child {
+  font-size: 11px;
+  color: var(--muted);
+  margin: 0;
+  line-height: 1.6;
+}
+.music-tabs {
+  display: flex;
+  gap: 6px;
+  padding: 0 24px;
+  border-bottom: 1px solid var(--line);
+}
+.music-tabs button {
+  padding: 12px 16px;
+  color: var(--muted);
+  font-size: 12px;
+  border-bottom: 2px solid transparent;
+}
+.music-tabs button[aria-selected="true"] {
+  color: var(--normal);
+  border-bottom-color: var(--normal);
+  background: #94d2d40a;
+}
+.music-pane {
+  padding: 20px 24px;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+.music-add {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 14px;
+  border: 1px solid var(--normal);
+  color: var(--normal);
+  font-size: 12px;
+  cursor: url("../assets/ponteiro.png"), pointer;
+}
+.music-add:hover {
+  color: var(--hover);
+  border-color: var(--hover);
+}
+.music-add:focus-within {
+  outline: 2px solid var(--normal);
+  outline-offset: 3px;
+}
+.music-add input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  width: 100%;
+  cursor: url("../assets/ponteiro.png"), pointer;
+}
+.music-add .pixel-art {
+  width: 24px;
+  height: 24px;
+}
+.music-note {
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.8;
+  margin: 12px 0;
+}
+.music-player {
+  border: 1px solid var(--line);
+  padding: 18px;
+  margin-top: 18px;
+  background: var(--base);
+}
+.music-now {
+  font-size: 13px;
+  color: var(--normal);
+  overflow-wrap: anywhere;
+  margin: 0 0 14px;
+}
+.music-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+}
+.music-controls .pixel-button:disabled {
+  opacity: 0.3;
+  border-color: transparent;
+}
+.music-next .pixel-art {
+  transform: scaleX(-1);
+}
+.music-timeline {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+.music-timeline time {
+  font-size: 10px;
+  color: var(--muted);
+}
+.music-timeline input {
+  flex: 1;
+  min-width: 0;
+  accent-color: var(--normal);
+  cursor: url("../assets/ponteiro.png"), pointer;
+}
+.music-download,
+.music-provider-link {
+  display: inline-block;
+  margin-top: 14px;
+  font-size: 11px;
+  color: var(--normal);
+  text-underline-offset: 3px;
+}
+.music-queue {
+  display: grid;
+  gap: 6px;
+  margin-top: 16px;
+}
+.music-empty {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.8;
+  padding: 12px 0;
+}
+.music-track {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--line);
+  background: var(--base);
+  padding: 3px 8px;
+}
+.music-track.current {
+  border-color: var(--normal);
+}
+.music-track-name {
+  flex: 1;
+  min-width: 0;
+  padding: 12px 4px;
+  font-size: 12px;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+.music-track .pixel-button {
+  flex-shrink: 0;
+}
+.music-track .pixel-art {
+  width: 24px;
+  height: 24px;
+}
+.music-status {
+  margin: 0;
+  padding: 12px 24px;
+  min-height: 40px;
+  border-top: 1px solid var(--line);
+  color: var(--normal);
+  font-size: 11px;
+  line-height: 1.6;
+}
+.music-link-form > label {
+  display: block;
+  font-size: 12px;
+  color: var(--normal);
+  margin-bottom: 10px;
+}
+.music-link-form > div {
+  display: flex;
+  gap: 8px;
+}
+.music-link-form input {
+  min-width: 0;
+  flex: 1;
+  padding: 12px;
+  border: 1px solid var(--line);
+  background: var(--base);
+  color: var(--text);
+  font-size: 12px;
+}
+.music-link-form button {
+  padding: 12px;
+  border: 1px solid var(--normal);
+  color: var(--normal);
+  font-size: 11px;
+}
+.music-embed {
+  border: 1px dashed var(--line);
+  margin-top: 20px;
+  min-height: 160px;
+}
+.music-embed > p {
+  font-size: 12px;
+  line-height: 1.8;
+  color: var(--muted);
+  padding: 24px;
+  margin: 0;
+}
+.music-embed iframe {
+  display: block;
+  width: 100%;
+  height: 340px;
+  border: 0;
+  background: var(--base);
+}
+#music-youtube .music-embed iframe {
+  aspect-ratio: 16 / 9;
+  height: auto;
+  min-height: 180px;
+}
+@media (max-width: 600px) {
+  .music-heading {
+    padding: 16px;
+  }
+  .music-heading h3 {
+    font-size: 22px;
+  }
+  .music-tabs {
+    padding: 0 12px;
+    gap: 3px;
+  }
+  .music-tabs button {
+    padding: 12px 9px;
+    font-size: 11px;
+  }
+  .music-pane {
+    padding: 16px;
+  }
+  .music-status {
+    padding: 10px 16px;
+  }
+  .music-link-form > div {
+    flex-direction: column;
+  }
+}
+
+/* O mesmo iframe permanece vivo; em segundo plano vira uma janela compacta. */
+.media-dock {
+  position: fixed;
+  z-index: 1800;
+  right: 16px;
+  bottom: calc(var(--bar) + 12px);
+  width: min(320px, calc(100vw - 24px));
+  background: var(--base);
+  border: 1px solid var(--normal);
+  box-shadow: 5px 5px 0 #100c1e88;
+}
+.media-dock-frame {
+  height: 200px;
+}
+.media-dock-frame iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+.media-dock:not(.media-dock-external) .media-dock-frame {
+  display: none;
+}
+.media-dock-info {
+  padding: 12px;
+}
+.media-dock-provider {
+  color: var(--muted);
+  font-size: 9px;
+  letter-spacing: 1px;
+}
+.media-dock-title {
+  font-size: 12px;
+  color: var(--normal);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin: 8px 0;
+}
+.media-dock-buttons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.media-dock-buttons .pixel-button {
+  width: 32px;
+  min-width: 32px;
+  height: 32px;
+}
+.media-dock-buttons .pixel-art {
+  width: 24px;
+  height: 24px;
+}
+.media-dock-buttons button:disabled {
+  opacity: 0.35;
+  border-color: transparent;
+}
+.media-dock-open {
+  font-size: 10px;
+  color: var(--normal);
+  margin-left: auto;
+  padding: 6px;
+}
+.media-dock.media-dock-embedded {
+  z-index: 1000;
+  box-shadow: none;
+  border: 0;
+  right: auto;
+  bottom: auto;
+}
+.media-dock-embedded .media-dock-info {
+  display: none;
+}
+.media-dock-embedded .media-dock-frame {
+  height: 100%;
+}

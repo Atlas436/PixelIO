@@ -1,8 +1,8 @@
-import { apps } from "./apps.js";
-import { decorateButton } from "./assets.js";
-import { setupDesktop } from "./desktop.js";
-import { setupTaskbar } from "./taskbar.js";
-import { WindowManager } from "./windows.js";
+import { apps } from "./system/apps.js";
+import { decorateButton } from "./shared/assets.js";
+import { setupDesktop } from "./system/desktop.js";
+import { setupTaskbar } from "./system/taskbar.js";
+import { WindowManager } from "./system/windows.js";
 
 const welcome = document.querySelector("#welcome");
 const boot = document.querySelector("#boot");

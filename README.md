@@ -8,36 +8,23 @@ Na pasta do projeto, execute `python3 -m http.server 8080` e abra http://localho
 
 ## Estrutura
 
-- `index.html`: telas e estrutura acessível da interface.
-- `style.css`: paleta oficial, layout adaptável e estados visuais.
-- `js/main.js`: apresentação, inicialização e encerramento.
-- `js/desktop.js`: seleção e abertura dos atalhos.
-- `js/taskbar.js`: aplicativos abertos, menu, relógio e painéis.
-- `js/windows.js`: abertura, foco, sobreposição, arraste e controles das janelas.
-- `js/apps.js`: catálogo, ícones e abertura dos aplicativos implementados.
-- `js/notes.js` e `js/files.js`: aplicativos Notas e Arquivos.
-- `js/documents-store.js`: dados locais compartilhados em IndexedDB.
-- `js/file-tree.js`: caminhos e validação da hierarquia de pastas.
-- `js/document-dialog.js` e `documents.css`: confirmações e visual desses dois aplicativos.
-- `js/gallery.js` e `js/images.js`: Galeria, validação de imagens e exportação de notas com imagens.
-- `js/music.js` e `music.css`: interface e player do Música.
-- `js/music-links.js`: validação dos links e geração de URLs dos players oficiais.
-- `js/audio-settings.js`: volume compartilhado entre barra e arquivos locais.
-- `js/media-controls.js`: mini player e Media Session do navegador.
-- `js/external-media.js`: integração com as APIs oficiais dos players do YouTube e Spotify.
-- `assets/icones/`: sete PNGs originais da pasta `icones` do Drive e arte do Pixel Studio.
-- `js/settings.js`: preferências e janela de Configurações.
-- `js/taskbar-visibility.js`: ocultação e revelação da barra.
-- `js/notifications.js`: avisos internos dos aplicativos.
-- `js/spider-drag.js`: arraste da mesa por mouse, caneta e toque.
-- `IDEIAS.md`: ideias guardadas para próximas etapas, incluindo o app Música.
-- `js/spider-rules.js`: regras e dificuldades da Spider, independentes da interface.
-- `js/spider-cards.js`: imagens, naipes e recortes visuais do baralho.
-- `js/spider.js` e `spider.css`: mesa e interação do jogo.
-- `assets/baralho/`: cartas originais dos quatro naipes e verso novo.
-- `js/assets.js`: integração dos PNGs autorais.
-- `assets/`: recursos originais fornecidos pelo autor.
-- `.github/workflows/pages.yml`: publicação pelo GitHub Pages.
+```text
+PixelIO/
+├── index.html          # Entrada do site
+├── css/                # Estilos da interface e dos apps
+├── js/
+│   ├── main.js         # Inicialização e encerramento
+│   ├── apps/           # Telas e comportamento de cada aplicativo
+│   ├── system/         # Desktop, janelas, barra e catálogo de apps
+│   └── shared/         # Regras, armazenamento e recursos reutilizados
+├── assets/             # Artes, cartas, ícones e cursor originais
+├── tests/              # Testes de regras e de navegador
+├── scripts/            # Verificação do código
+├── docs/               # Ideias e documentação complementar
+└── .github/workflows/  # Publicação no GitHub Pages
+```
+
+Os comandos npm são executados na raiz do repositório. A organização é dos arquivos de desenvolvimento: as pastas virtuais do app Arquivos e os bancos locais mantêm os mesmos nomes e dados. O site continua estático, sem compilação.
 
 ## Recursos visuais
 
@@ -118,7 +105,7 @@ Os SDKs oficiais do YouTube e Spotify são carregados somente ao abrir um link. 
 
 O volume da barra controla os arquivos locais. YouTube e Spotify possuem controles próprios, com disponibilidade, login e eventuais limitações de reprodução determinados pelos serviços. Não há conversão ou download de áudio desses serviços: a opção de baixar serve apenas aos arquivos locais adicionados pelo usuário.
 
-A verificação automatizada reproduz WAV real e testa os controles, volume, fila, download local e liberação dos recursos. Os iframes e SDKs externos são simulados nos testes para verificar seus links, comandos e ciclo de vida; isso não comprova a disponibilidade de cada conteúdo nos serviços reais. `media-browser-test.cjs` verifica o mini player, Media Session com WAV real, estados/comandos das APIs simuladas, permanência do iframe, restauração e limpeza. Consulte [YouTube IFrame API](https://developers.google.com/youtube/iframe_api_reference) e [Spotify IFrame API](https://developer.spotify.com/documentation/embeds/references/iframe-api).
+A verificação automatizada reproduz WAV real e testa os controles, volume, fila, download local e liberação dos recursos. Os iframes e SDKs externos são simulados nos testes para verificar seus links, comandos e ciclo de vida; isso não comprova a disponibilidade de cada conteúdo nos serviços reais. `tests/media-browser-test.cjs` verifica o mini player, Media Session com WAV real, estados/comandos das APIs simuladas, permanência do iframe, restauração e limpeza. Consulte [YouTube IFrame API](https://developers.google.com/youtube/iframe_api_reference) e [Spotify IFrame API](https://developer.spotify.com/documentation/embeds/references/iframe-api).
 
 ## Configurações e barra de tarefas
 
@@ -174,13 +161,13 @@ Os caminhos são relativos e funcionam sob `/PixelIO/` sem configuração de bas
 
 `npm run check` verifica a sintaxe de todos os módulos, sem instalar dependências. Para o teste funcional, execute `npm ci` e `npx playwright install chromium`, deixe o servidor local aberto em outro terminal e execute `npm test`. Se o Chromium estiver em `/usr/bin/chromium`, ele será usado automaticamente; para outro caminho, defina `CHROMIUM_PATH`. Para outro endereço local, defina `PIXEL_URL`.
 
-`taskbar-browser-test.cjs` verifica ocultação por mouse, toque e teclado, menus, notificações, preservação do foco, persistência, armazenamento bloqueado e a área útil das janelas.
+`tests/taskbar-browser-test.cjs` verifica ocultação por mouse, toque e teclado, menus, notificações, preservação do foco, persistência, armazenamento bloqueado e a área útil das janelas.
 
-O teste `smoke-test.cjs` cobre apresentação e boot, seleção, abertura dos dez apps, prevenção de duplicatas, foco, arraste, minimizar/restaurar, maximizar/restaurar, fechar, menus, notificações, volume, imagens, tela de 360×640, encerramento e reinício. Playwright é dependência apenas de desenvolvimento.
+O teste `tests/smoke-test.cjs` cobre apresentação e boot, seleção, abertura dos dez apps, prevenção de duplicatas, foco, arraste, minimizar/restaurar, maximizar/restaurar, fechar, menus, notificações, volume, imagens, tela de 360×640, encerramento e reinício. Playwright é dependência apenas de desenvolvimento.
 
-`npm run test:spider` executa os 20 testes de regras sem dependências externas. `npm test` executa também o teste do desktop e `spider-browser-test.cjs`, com distribuição/desfazer, movimentação por clique, arraste e teclado, dicas, confirmação, preservação da sessão, vitória, imagens, toque, escolha das três dificuldades e cancelamento da troca de modo. Os testes usam um servidor estático aberto em http://localhost:8080. O baralho permanece com 104 cartas após jogadas, distribuições e desfazer, verificado em partidas com embaralhamentos determinísticos. Não há etapa de build porque o navegador recebe HTML, CSS e JavaScript diretamente. Publicação remota depende de ativar GitHub Pages nas configurações do repositório.
+`npm run test:spider` executa os 20 testes de regras sem dependências externas. `npm test` executa também o teste do desktop e `tests/spider-browser-test.cjs`, com distribuição/desfazer, movimentação por clique, arraste e teclado, dicas, confirmação, preservação da sessão, vitória, imagens, toque, escolha das três dificuldades e cancelamento da troca de modo. Os testes usam um servidor estático aberto em http://localhost:8080. O baralho permanece com 104 cartas após jogadas, distribuições e desfazer, verificado em partidas com embaralhamentos determinísticos. Não há etapa de build porque o navegador recebe HTML, CSS e JavaScript diretamente. Publicação remota depende de ativar GitHub Pages nas configurações do repositório.
 
-Os testes `music-links-test.mjs` e `music-browser-test.cjs` cobrem URLs aceitas/rejeitadas, ícones, reprodução WAV real, fila, pausa, posição, volume, minimizar, download local, troca de players, fechamento e encerramento, incluindo tela pequena. `npm run test:music` executa somente essas verificações (servidor local aberto).
+Os testes `tests/music-links-test.mjs` e `tests/music-browser-test.cjs` cobrem URLs aceitas/rejeitadas, ícones, reprodução WAV real, fila, pausa, posição, volume, minimizar, download local, troca de players, fechamento e encerramento, incluindo tela pequena. `npm run test:music` executa somente essas verificações (servidor local aberto).
 
 `npm run test:documents` executa os testes de nomes/busca e a integração real em IndexedDB no Chromium: autosave, busca, exportação Notas→Arquivos, cópias independentes, renomear, download UTF-8, abertura no Notas, confirmações, fechamento com edição pendente, importação segura, imagens, persistência após recarregar, tela pequena e erro de armazenamento. O servidor local deve estar aberto.
 
@@ -188,7 +175,7 @@ Os testes `music-links-test.mjs` e `music-browser-test.cjs` cobrem URLs aceitas/
 
 `npm run test:images` verifica importação e validação da Galeria, download com bytes originais, anexos em notas, persistência, cópias independentes, remoção confirmada, exportação HTML com imagens embutidas e texto escapado, compatibilidade com TXT e tela pequena.
 
-Esses testes também verificam legendas, reordenação persistente e ações visíveis da Galeria. `test:folders` inclui `bulk-files-browser-test.cjs`, com seleção múltipla, busca, preservação dos bytes e cancelamento atômico em conflitos de nome ou ciclos.
+Esses testes também verificam legendas, reordenação persistente e ações visíveis da Galeria. `test:folders` inclui `tests/bulk-files-browser-test.cjs`, com seleção múltipla, busca, preservação dos bytes e cancelamento atômico em conflitos de nome ou ciclos.
 
 `npm run test:windows` verifica abertura com um clique nos dez apps, fechamento pelos cantos dos controles, Enter/Espaço, toque, salvamento de notas ao fechar e encerramento mesmo quando a limpeza de um app falha. Os testes existentes do desktop e dos apps usam a abertura por clique.
 
@@ -207,7 +194,7 @@ O Terminal usa a linguagem Pixel para controlar os aplicativos da interface:
 
 Os comandos aceitam maiúsculas, espaços extras e nomes sem acento; `pixel abrir "Pixel Studio"` também funciona. Enter ou o botão autoral executa. Setas ↑ e ↓ navegam pelo histórico da sessão, preservando o texto ainda não enviado. O histórico guarda até 100 comandos e a saída até 150 entradas; fechar a janela limpa essa sessão. A entrada é tratada como texto e não é executada como JavaScript ou comando do computador.
 
-O Sobre contém Julia, Lais e Geovanna, a ideia do projeto, a inspiração nos desktops antigos e no Windows96, a tabela dos comandos e o link do repositório. O artigo está marcado como **em breve**, sem link provisório. A versão e a lista de comandos são compartilhadas entre os dois apps em `js/project-info.js`; `js/app-catalog.js` centraliza os aplicativos e `js/pixel-language.js` interpreta os comandos.
+O Sobre contém Julia, Lais e Geovanna, a ideia do projeto, a inspiração nos desktops antigos e no Windows96, a tabela dos comandos e o link do repositório. O artigo está marcado como **em breve**, sem link provisório. A versão e a lista de comandos são compartilhadas entre os dois apps em `js/shared/project-info.js`; `js/system/app-catalog.js` centraliza os aplicativos e `js/shared/pixel-language.js` interpreta os comandos.
 
 `npm run test:terminal` verifica interpretação, aliases, entradas inválidas, versão consistente com package.json e a integração no Chromium: ajuda, histórico, abrir/restaurar, foco, limpeza, conteúdo do Sobre, texto seguro e tela pequena. Requer o servidor local na porta 8080.
 
@@ -222,7 +209,7 @@ O ícone de Assistente IA (ou `pixel abrir guia` no Terminal) abre um guia espec
 - **Dicas** usa somente o identificador do último app usado, inclusive quando minimizado; é atualizado ao trocar de app e limpo ao encerrar o sistema. Não inspeciona documentos. O guia remove seu listener ao fechar.
 - Assuntos desconhecidos recebem uma explicação dos limites e perguntas alternativas. Pixel Studio é informado como pendente; o guia não afirma converter músicas externas nem recuperar dados apagados.
 
-`js/guide-knowledge.js` contém o conteúdo e a busca por assunto, e `js/guide.js` monta a conversa com texto seguro. `npm run test:guide` verifica perguntas, contexto, limites, atalhos, texto seguro, ausência de requisições de dados, limpeza da sessão e layout no celular. O teste usa o servidor local; `PIXEL_URL` permite escolher outra porta.
+`js/shared/guide-knowledge.js` contém o conteúdo e a busca por assunto, e `js/apps/guide.js` monta a conversa com texto seguro. `npm run test:guide` verifica perguntas, contexto, limites, atalhos, texto seguro, ausência de requisições de dados, limpeza da sessão e layout no celular. O teste usa o servidor local; `PIXEL_URL` permite escolher outra porta.
 
 ## Tamanho e encaixe das janelas
 
@@ -245,8 +232,8 @@ O menu desativa o encaixe com área menor que 640 px. Uma janela que já estava 
 
 ## Verificação do código
 
-`npm run check` usa `check-js.mjs` para verificar a sintaxe de todos os módulos em `js/`, incluindo arquivos novos automaticamente. `npm test` executa as verificações de regras e integração dos aplicativos. O servidor estático deve estar aberto; use `PIXEL_URL` para testar em outra porta.
+`npm run check` usa `scripts/check-js.mjs` para verificar a sintaxe de todos os módulos em `js/`, incluindo arquivos novos automaticamente. `npm test` executa as verificações de regras e integração dos aplicativos. O servidor estático deve estar aberto; use `PIXEL_URL` para testar em outra porta.
 
-O salvamento da Spider usa `js/spider-storage.js`, no banco local `pixel-oi-spider`, separado do banco de documentos para não exigir migração dos arquivos existentes. O carregamento valida o baralho completo e o histórico antes de restaurá-los. Um registro inválido é informado sem impedir uma nova partida. As gravações são sequenciais, e sair com alterações ainda não gravadas pode mostrar o aviso nativo do navegador.
+O salvamento da Spider usa `js/shared/spider-storage.js`, no banco local `pixel-oi-spider`, separado do banco de documentos para não exigir migração dos arquivos existentes. O carregamento valida o baralho completo e o histórico antes de restaurá-los. Um registro inválido é informado sem impedir uma nova partida. As gravações são sequenciais, e sair com alterações ainda não gravadas pode mostrar o aviso nativo do navegador.
 
 `npm run test:spider-storage` verifica recuperação após recarregar, três dificuldades, desfazer persistido, histórico limitado, cópia independente, validação de dados, troca de modo, cancelamento, notas existentes e armazenamento bloqueado.

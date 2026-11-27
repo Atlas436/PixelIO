@@ -4,18 +4,18 @@
   "private": true,
   "description": "Sistema operacional fictício em pixel art no navegador",
   "scripts": {
-    "check": "node check-js.mjs",
-    "test": "npm run test:spider && node smoke-test.cjs && node windows-browser-test.cjs && node spider-browser-test.cjs && node taskbar-browser-test.cjs && npm run test:music && npm run test:documents && npm run test:folders && npm run test:images && npm run test:terminal && npm run test:guide && npm run test:layout && npm run test:spider-storage",
-    "test:spider": "node --test spider-test.mjs",
-    "test:music": "node --test music-links-test.mjs && node music-browser-test.cjs && node media-browser-test.cjs",
-    "test:documents": "node --test documents-store-test.mjs && node documents-browser-test.cjs",
-    "test:folders": "node --test folders-test.mjs && node folders-browser-test.cjs && node bulk-files-browser-test.cjs",
-    "test:images": "node images-browser-test.cjs",
-    "test:windows": "node windows-browser-test.cjs",
-    "test:terminal": "node --test pixel-language-test.mjs && node terminal-about-browser-test.cjs",
-    "test:guide": "node --test guide-test.mjs && node guide-browser-test.cjs",
-    "test:layout": "node --test window-geometry-test.mjs && node window-layout-browser-test.cjs",
-    "test:spider-storage": "node --test spider-storage-test.mjs && node spider-persistence-browser-test.cjs"
+    "check": "node scripts/check-js.mjs",
+    "test": "npm run test:spider && node tests/smoke-test.cjs && node tests/windows-browser-test.cjs && node tests/spider-browser-test.cjs && node tests/taskbar-browser-test.cjs && npm run test:music && npm run test:documents && npm run test:folders && npm run test:images && npm run test:terminal && npm run test:guide && npm run test:layout && npm run test:spider-storage",
+    "test:spider": "node --test tests/spider-test.mjs",
+    "test:music": "node --test tests/music-links-test.mjs && node tests/music-browser-test.cjs && node tests/media-browser-test.cjs",
+    "test:documents": "node --test tests/documents-store-test.mjs && node tests/documents-browser-test.cjs",
+    "test:folders": "node --test tests/folders-test.mjs && node tests/folders-browser-test.cjs && node tests/bulk-files-browser-test.cjs",
+    "test:images": "node tests/images-browser-test.cjs",
+    "test:windows": "node tests/windows-browser-test.cjs",
+    "test:terminal": "node --test tests/pixel-language-test.mjs && node tests/terminal-about-browser-test.cjs",
+    "test:guide": "node --test tests/guide-test.mjs && node tests/guide-browser-test.cjs",
+    "test:layout": "node --test tests/window-geometry-test.mjs && node tests/window-layout-browser-test.cjs",
+    "test:spider-storage": "node --test tests/spider-storage-test.mjs && node tests/spider-persistence-browser-test.cjs"
   },
   "devDependencies": {
     "playwright": "1.65.1"
