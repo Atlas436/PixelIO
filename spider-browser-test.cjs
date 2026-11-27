@@ -31,6 +31,7 @@ const fs = require("node:fs");
     await page.locator('.desktop-app[data-app="solitaire"]').click();
     const app = page.locator(".spider-app");
     const win = page.locator('.window[data-app="solitaire"]');
+    await page.locator(".spider-modes").waitFor();
     assert.equal(await page.locator(".spider-mode").count(), 3);
     assert.equal(await app.count(), 0);
     await page.locator('[data-mode="1"]').click();

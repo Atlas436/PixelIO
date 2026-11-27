@@ -1,11 +1,69 @@
+import {
+  loadSpiderRecord,
+  saveSpiderRecord,
+  spiderRecord,
+  restoreSpiderRecord,
+} from "./spider-storage.js";
 import { SpiderGame, isSequence, suits, difficulties } from "./spider-rules.js";
 import { iconButton } from "./assets.js";
 import { setupSpiderDrag } from "./spider-drag.js";
 import { notifyApp } from "./notifications.js";
 import { cardImage, cardLabel, back } from "./spider-cards.js";
 
-// A partida permanece na memória ao fechar/reabrir a janela, até recarregar a página.
-let game;
+let game,
+  initialized,
+  saveQueue = Promise.resolve(),
+  revision = 0,
+  savedRevision = 0;
+let saveStatus = "Abrindo sua partida…";
+const saveListeners = new Set();
+function reportSave(message) {
+  saveStatus = message;
+  for (const listener of saveListeners) listener(message);
+}
+function loadGame() {
+  return (initialized ||= loadSpiderRecord()
+    .then((record) => {
+      if (record) {
+        game = restoreSpiderRecord(record);
+        reportSave(
+          game
+            ? "Partida recuperada deste navegador."
+            : "Não foi possível recuperar a partida salva. Você pode começar outra.",
+        );
+      } else
+        reportSave("A partida será salva automaticamente neste navegador.");
+    })
+    .catch(() =>
+      reportSave(
+        "Salvamento local indisponível. A partida ficará só nesta sessão até conseguirmos salvar.",
+      ),
+    ));
+}
+function persistGame() {
+  const record = spiderRecord(game),
+    version = ++revision;
+  reportSave("Salvando partida…");
+  saveQueue = saveQueue
+    .catch(() => {})
+    .then(() => saveSpiderRecord(record))
+    .then(() => {
+      savedRevision = version;
+      if (version === revision) reportSave("Partida salva neste navegador.");
+    })
+    .catch(() => {
+      if (version === revision)
+        reportSave(
+          "Não foi possível salvar. A partida ainda está nesta sessão; não recarregue antes de salvar.",
+        );
+    });
+}
+window.addEventListener("beforeunload", (event) => {
+  if (savedRevision < revision) {
+    event.preventDefault();
+    event.returnValue = "";
+  }
+});
 function createTable(onHome) {
   let selection = null;
   let hintTarget = null;
@@ -33,7 +91,7 @@ function createTable(onHome) {
       <p>Organize as cartas de Rei até Ás. Arraste uma carta ou uma sequência em ordem; também pode clicar ou tocar na carta e depois na coluna de destino. Enter ou Espaço seleciona uma carta; os números das colunas são botões de destino.</p>
       <p>Uma carta vai sobre outra de valor imediatamente maior. Uma sequência só se move junta quando todas as cartas são do mesmo naipe e estão em ordem. Sobre outra coluna, o naipe pode ser diferente, desde que o valor seja um acima. Qualquer sequência válida pode ir para uma coluna vazia. Complete oito sequências de Rei a Ás do mesmo naipe para vencer. As cartas cobertas viram automaticamente.</p>
       <p>O monte distribui uma carta em cada coluna, até cinco vezes. Preencha as colunas vazias antes de distribuir. Desfazer reverte uma jogada inteira, inclusive cartas viradas e sequências retiradas. Dica sugere uma jogada, sem garantir a solução.</p>
-      <p>Sua arte original está nas cartas. O 9 de espadas usa uma imagem provisória até recebermos o PNG. A partida fica nesta sessão ao fechar a janela; recarregar a página inicia outra.</p>
+      <p>Sua arte original está nas cartas. O 9 de espadas usa uma imagem provisória até recebermos o PNG. A partida é salva automaticamente neste navegador. Confira a confirmação de salvamento antes de sair. Limpar os dados do site pode apagar o progresso. O salvamento mantém até 100 jogadas para desfazer.</p>
     </details>
     <section class="spider-confirm" hidden role="dialog" aria-labelledby="spider-confirm-title">
       <div><h3 id="spider-confirm-title">Começar de novo?</h3><p>A partida atual será substituída por um novo embaralhamento.</p><div class="spider-confirm-actions"><button type="button" data-confirm="no">Continuar jogando</button><button type="button" data-confirm="yes">Nova partida</button></div></div>
@@ -51,8 +109,10 @@ function createTable(onHome) {
     content.inert = true;
     root.querySelector('[data-confirm="no"]').focus();
   });
+  action("salvar", "Salvar partida", persistGame);
   const undoButton = action("seta", "Desfazer", () => {
     if (!game.undo()) return;
+    persistGame();
     selection = hintTarget = null;
     render("Jogada desfeita.");
   });
@@ -94,6 +154,7 @@ function createTable(onHome) {
     .addEventListener("click", closeConfirmation);
   root.querySelector('[data-confirm="yes"]').addEventListener("click", () => {
     game.newGame();
+    persistGame();
     selection = hintTarget = null;
     closeConfirmation();
     render("Nova partida. Boa sorte!");
@@ -125,6 +186,7 @@ function createTable(onHome) {
       return;
     }
     game.deal();
+    persistGame();
     selection = hintTarget = null;
     render("Uma nova carta foi distribuída em cada coluna.");
   });
@@ -141,6 +203,7 @@ function createTable(onHome) {
       return;
     }
     selection = hintTarget = null;
+    persistGame();
     render(`Cartas movidas para a coluna ${to + 1}.`);
     columns
       .querySelector(`[data-destination="${to}"]`)
@@ -317,8 +380,20 @@ function createTable(onHome) {
 export function createSpider() {
   const host = document.createElement("div");
   host.className = "spider-host";
+  const view = document.createElement("div");
+  view.className = "spider-view";
+  const saveMessage = document.createElement("p");
+  saveMessage.className = "spider-save-status";
+  saveMessage.setAttribute("role", "status");
+  const updateSave = (message) => {
+    saveMessage.textContent = message;
+  };
+  updateSave(saveStatus);
+  saveListeners.add(updateSave);
+  host.append(view, saveMessage);
+  let disposed = false;
   function showTable() {
-    host.replaceChildren(createTable(showHome));
+    view.replaceChildren(createTable(showHome));
     host.querySelector(".spider-scroll").focus({ preventScroll: true });
   }
   function showHome() {
@@ -335,6 +410,7 @@ export function createSpider() {
     let pending = null;
     function start(count) {
       game = new SpiderGame(Math.random, count);
+      persistGame();
       showTable();
     }
     for (const mode of difficulties) {
@@ -395,9 +471,16 @@ export function createSpider() {
         cancel();
       }
     });
-    host.replaceChildren(home);
+    view.replaceChildren(home);
     home.querySelector("button").focus({ preventScroll: true });
   }
-  showHome();
+  view.textContent = "Carregando partida…";
+  loadGame().then(() => {
+    if (!disposed) showHome();
+  });
+  host.dispose = () => {
+    disposed = true;
+    saveListeners.delete(updateSave);
+  };
   return host;
 }

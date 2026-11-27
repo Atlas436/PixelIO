@@ -5,7 +5,7 @@
   "description": "Sistema operacional fictício em pixel art no navegador",
   "scripts": {
     "check": "node check-js.mjs",
-    "test": "npm run test:spider && node smoke-test.cjs && node windows-browser-test.cjs && node spider-browser-test.cjs && node taskbar-browser-test.cjs && npm run test:music && npm run test:documents && npm run test:folders && npm run test:images && npm run test:terminal && npm run test:guide && npm run test:layout",
+    "test": "npm run test:spider && node smoke-test.cjs && node windows-browser-test.cjs && node spider-browser-test.cjs && node taskbar-browser-test.cjs && npm run test:music && npm run test:documents && npm run test:folders && npm run test:images && npm run test:terminal && npm run test:guide && npm run test:layout && npm run test:spider-storage",
     "test:spider": "node --test spider-test.mjs",
     "test:music": "node --test music-links-test.mjs && node music-browser-test.cjs && node media-browser-test.cjs",
     "test:documents": "node --test documents-store-test.mjs && node documents-browser-test.cjs",
@@ -14,7 +14,8 @@
     "test:windows": "node windows-browser-test.cjs",
     "test:terminal": "node --test pixel-language-test.mjs && node terminal-about-browser-test.cjs",
     "test:guide": "node --test guide-test.mjs && node guide-browser-test.cjs",
-    "test:layout": "node --test window-geometry-test.mjs && node window-layout-browser-test.cjs"
+    "test:layout": "node --test window-geometry-test.mjs && node window-layout-browser-test.cjs",
+    "test:spider-storage": "node --test spider-storage-test.mjs && node spider-persistence-browser-test.cjs"
   },
   "devDependencies": {
     "playwright": "1.65.1"

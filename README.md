@@ -147,7 +147,7 @@ Todos os modos têm 104 cartas: dez colunas com 54 cartas e um monte com 50, div
 - Distribuir coloca uma carta em cada coluna. Nenhuma coluna pode estar vazia. O monte não é reciclado.
 - Desfazer restaura toda a ação anterior, incluindo distribuições, cartas viradas e sequências retiradas. Dica sugere uma transferência útil; não garante que a partida tenha solução.
 - A pontuação começa em 500, perde um ponto por jogada/distribuição e ganha 100 por sequência completa. Desfazer restaura a pontuação anterior.
-- Novo jogo pede confirmação e mantém a dificuldade atual. **Início** volta à escolha de dificuldade sem perder a partida. **Continuar partida** retoma o jogo; escolher outra dificuldade só substitui a partida após confirmação. Fechar, minimizar ou reabrir a janela preserva a partida nesta sessão; recarregar a página perde o progresso. Não há salvamento em servidor ou no navegador.
+- Novo jogo pede confirmação e mantém a dificuldade atual. **Início** volta à escolha de dificuldade sem perder a partida. **Continuar partida** retoma o jogo; escolher outra dificuldade só substitui a partida após confirmação. A partida é salva automaticamente em IndexedDB, neste navegador/perfil, após cada jogada, distribuição, desfazer e nova partida. Ao voltar ao site, use **Continuar partida**. Até 100 jogadas para desfazer são preservadas no salvamento. Espere a confirmação **Partida salva neste navegador** antes de sair; **Salvar partida** permite tentar novamente se houver falha. Se o armazenamento estiver bloqueado, o jogo continua na sessão e mostra o erro. Limpar os dados do site, usar outro navegador/perfil ou encerrar uma sessão privada pode apagar o progresso.
 - Em telas pequenas, role a mesa horizontalmente para acessar as dez colunas. Também é possível maximizar a janela.
 
 O verso é o mesmo nos três modos. Rótulos de cartas, dicas e sequências concluídas identificam o naipe correspondente. O menu inicial é exibido ao reabrir a janela e oferece continuar a partida da sessão.
@@ -246,3 +246,7 @@ O menu desativa o encaixe com área menor que 640 px. Uma janela que já estava 
 ## Verificação do código
 
 `npm run check` usa `check-js.mjs` para verificar a sintaxe de todos os módulos em `js/`, incluindo arquivos novos automaticamente. `npm test` executa as verificações de regras e integração dos aplicativos. O servidor estático deve estar aberto; use `PIXEL_URL` para testar em outra porta.
+
+O salvamento da Spider usa `js/spider-storage.js`, no banco local `pixel-oi-spider`, separado do banco de documentos para não exigir migração dos arquivos existentes. O carregamento valida o baralho completo e o histórico antes de restaurá-los. Um registro inválido é informado sem impedir uma nova partida. As gravações são sequenciais, e sair com alterações ainda não gravadas pode mostrar o aviso nativo do navegador.
+
+`npm run test:spider-storage` verifica recuperação após recarregar, três dificuldades, desfazer persistido, histórico limitado, cópia independente, validação de dados, troca de modo, cancelamento, notas existentes e armazenamento bloqueado.

@@ -49,3 +49,9 @@
 
 - Redimensionar pelas bordas/cantos, menu Organizar e encaixe lado a lado.
 - Atalhos Alt + Shift + setas, preservação do tamanho livre e adaptação a telas estreitas.
+
+## Spider — salvamento local implementado
+
+- Partida automática em IndexedDB, com até 100 jogadas para desfazer após reabrir o site.
+- Confirmação de salvamento, tentativa manual e indicação de falha sem bloquear o jogo.
+- Backup/exportação dos dados do navegador pode ser uma próxima melhoria.
